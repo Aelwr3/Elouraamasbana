@@ -18,6 +18,8 @@
             font-family: 'Amiri', serif;
             background: #f5f5f5;
             color: var(--text-color);
+            position: relative;
+            overflow-x: hidden;
         }
 
         .invoice-container {
@@ -27,6 +29,7 @@
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            animation: floatInvoice 3s ease-in-out infinite;
         }
 
         .header-section {
@@ -39,15 +42,12 @@
         }
 
         .logo {
-            width: 150px;
+            width: 100px;
+            animation: grabHand 2s ease-in-out;
         }
 
         .invoice-info {
-            text-align: left;
-        }
-
-        .invoice-details {
-            margin-bottom: 30px;
+            text-align: right;
         }
 
         .items-table {
@@ -90,14 +90,27 @@
             font-weight: bold;
         }
 
+        .hand-animation {
+            position: fixed;
+            bottom: -50px;
+            right: -50px;
+            width: 200px;
+            animation: moveHand 10s linear forwards;
+        }
+
+        @keyframes floatInvoice {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes moveHand {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-100vw, -100vh) rotate(360deg); }
+        }
+
         @media print {
-            .actions, .back-button {
+            .actions, .back-button, .hand-animation {
                 display: none !important;
-            }
-            
-            .invoice-container {
-                box-shadow: none;
-                padding: 0;
             }
         }
 
@@ -112,28 +125,38 @@
             cursor: pointer;
             text-decoration: none;
         }
+
+        .countdown {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body>
-    <a class="back-button" href="customization.html">← الرجوع</a>
+    <a class="back-button" href="customization.html">← الرجوع للتعديل</a>
+    <div class="countdown" id="countdown">10</div>
 
     <div class="invoice-container">
-        <!-- رأس الفاتورة -->
         <div class="header-section">
             <div class="invoice-info">
                 <h2>مصبنة مشاء الله</h2>
                 <p>تاريخ الفاتورة: <span id="invoiceDate"></span></p>
                 <p>رقم الفاتورة: <span id="invoiceNumber"></span></p>
             </div>
-            <img src="https://via.placeholder.com/150x60/002b4d/ffffff?text=مصبنة+مشاء+الله" class="logo" alt="الشعار">
+            <img src="https://cdn-icons-png.flaticon.com/512/2975/2975175.png" 
+                 class="logo" 
+                 alt="شعار المصبنة">
         </div>
 
-        <!-- تفاصيل الفاتورة -->
         <div class="invoice-details">
             <h3>الزبون: <span id="customerName">عميل جديد</span></h3>
         </div>
 
-        <!-- جدول العناصر -->
         <table class="items-table">
             <thead>
                 <tr>
@@ -146,30 +169,29 @@
             <tbody id="invoiceItems"></tbody>
         </table>
 
-        <!-- المجموع الكلي -->
         <div class="total-section">
             <p>المجموع الكلي: <span id="totalAmount">0</span> درهم</p>
         </div>
 
-        <!-- أزرار التحكم -->
         <div class="actions">
             <button class="print-btn" onclick="window.print()">🖨️ طباعة الفاتورة</button>
         </div>
     </div>
 
+    <img src="https://cdn-icons-png.flaticon.com/512/3466/3466901.png" 
+         class="hand-animation" 
+         alt="يد تمسك الفاتورة">
+
     <script>
         // توليد بيانات الفاتورة
         function generateInvoice() {
-            // استرجاع البيانات من localStorage
             const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
             const customer = JSON.parse(localStorage.getItem('selectedCustomer')) || { name: 'عميل جديد' };
 
-            // تعبئة البيانات
             document.getElementById('customerName').textContent = customer.name;
             document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString();
             document.getElementById('invoiceNumber').textContent = '#' + Date.now().toString().slice(-6);
 
-            // تعبئة العناصر
             const itemsContainer = document.getElementById('invoiceItems');
             itemsContainer.innerHTML = items.map(item => `
                 <tr>
@@ -180,13 +202,35 @@
                 </tr>
             `).join('');
 
-            // حساب المجموع الكلي
             const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             document.getElementById('totalAmount').textContent = total;
         }
+
+        // العد التنازلي التلقائي
+        let seconds = 10;
+        const countdownElement = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            if(seconds <= 0) {
+                clearInterval(timer);
+                if(confirm('⚠️ سيتم تحويلك لصفحة الدفع خلال 3 ثواني')) {
+                    setTimeout(() => {
+                        window.location.href = 'payment.html';
+                    }, 3000);
+                }
+            }
+        }, 1000);
+
+        // إلغاء العد التنازلي عند الرجوع
+        document.querySelector('.back-button').addEventListener('click', () => {
+            clearInterval(timer);
+            localStorage.removeItem('selectedItems');
+        });
 
         // التحميل الأولي
         generateInvoice();
     </script>
 </body>
-  </html>
+</html>

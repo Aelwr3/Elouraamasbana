@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مصبنة مشاء الله</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* إعدادات عامة */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Amiri', serif;
+      background: linear-gradient(135deg, #002b4d, #004c6d);
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* تصميم الحاوية */
+    .container {
+      background: #003954;
+      border: 1px solid #005f99;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      animation: slideIn 1.2s ease-in-out;
+      z-index: 2;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: #e0f7fa;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    p {
+      font-size: 18px;
+      color: #b3e5fc;
+      margin-bottom: 20px;
+    }
+
+    input[type="password"] {
+      width: 80%;
+      padding: 12px;
+      margin: 20px auto;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      text-align: center;
+      background-color: #005f99;
+      color: #ffffff;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    input[type="password"]::placeholder {
+      color: #cce7f3;
+      font-style: italic;
+    }
+
+    button {
+      background: linear-gradient(90deg, #007acc, #005f99);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background: #004a73;
+    }
+
+    /* الأيقونات في الخلفية */
+    .icon {
+      position: absolute;
+      opacity: 0.1;
+      width: 120px;
+      height: 120px;
+      z-index: 1;
+    }
+
+    .icon1 {
+      top: 10%;
+      left: 5%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .icon2 {
+      top: 25%;
+      right: 10%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .icon3 {
+      bottom: 20%;
+      left: 15%;
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .icon4 {
+      bottom: 10%;
+      right: 5%;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .icon5 {
+      top: 50%;
+      left: 40%;
+      animation: float 6.5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes slideIn {
+      0% {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* إخفاء رسالة الخطأ بشكل افتراضي */
+    .error {
+      display: none;
+      font-size: 16px;
+      color: #ff5252;
+      margin-top: 10px;
+      animation: fadeIn 0.8s ease-in;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://cdn-icons-png.flaticon.com/512/3322/3322056.png" alt="Laundry Machine" class="icon icon1">
+  <img src="https://cdn-icons-png.flaticon.com/512/2975/2975175.png" alt="Laundry" class="icon icon2">
+  <img src="https://cdn-icons-png.flaticon.com/512/1748/1748971.png" alt="Detergent" class="icon icon3">
+  <img src="https://cdn-icons-png.flaticon.com/512/3440/3440626.png" alt="Laundry Basket" class="icon icon4">
+  <img src="https://cdn-icons-png.flaticon.com/512/4079/4079304.png" alt="Iron" class="icon icon5">
+
+  <div class="container">
+    <h1>مرحبًا بكم في مصبنة مشاء الله</h1>
+    <p>يرجى إدخال الكود للمتابعة</p>
+    <input type="password" id="codeInput" placeholder="أدخل الكود هنا">
+    <button id="confirmButton">تأكيد</button>
+    <p class="error" id="errorMessage">❌ الكود غير صحيح! حاول مرة أخرى.</p>
+  </div>
+
+  <script>
+    const correctCode = "202501";
+    const confirmButton = document.getElementById('confirmButton');
+    const codeInput = document.getElementById('codeInput');
+    const errorMessage = document.getElementById('errorMessage');
+
+    confirmButton.addEventListener('click', () => {
+      if (codeInput.value === correctCode) {
+        errorMessage.style.display = 'none'; // إخفاء رسالة الخطأ إذا كانت ظاهرة
+        document.body.innerHTML = `<h1 style="color:#00e676; text-align:center;">✅ الكود صحيح! يتم الآن التوجيه...</h1>`;
+        setTimeout(() => {
+          window.location.href = "customer-selection.html";
+        }, 2000); // انتظار ثانيتين قبل التوجيه
+      } else {
+        errorMessage.style.display = 'block'; // إظهار رسالة الخطأ
+      }
+    });
+  </script>
+</body>
+</html>

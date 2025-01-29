@@ -1,185 +1,151 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إدارة الزبائن - مصبنة مشاء الله</title>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <!-- ... (بقية الhead كما هي) ... -->
   <style>
-    /* أنماط مشتركة مع الصفحة السابقة */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Amiri', serif; /* تم تطبيق الخط هنا */
-      background: linear-gradient(135deg, #002b4d, #004c6d);
-      color: #ffffff;
-      min-height: 100vh;
-      overflow: auto;
-      position: relative;
-    }
-
-    .container {
-      background: #003954dd;
-      border: 1px solid #005f99;
+    /* إضافة أنماط جديدة للرسائل المخصصة */
+    .custom-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #004d73;
+      padding: 25px;
       border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-      text-align: center;
-      animation: slideIn 1s ease-in-out;
-      max-width: 800px;
-      margin: 50px auto;
-    }
-
-    /* أنماط جديدة خاصة بهذه الصفحة */
-    .customer-list {
-      margin: 30px 0;
-      border-top: 2px solid #005f99;
-      padding-top: 20px;
-    }
-
-    .customer-card {
-      background: #005f9955;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 15px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform 0.3s;
-      font-family: 'Amiri', serif; /* تطبيق الخط على البطاقات */
-    }
-
-    .customer-card:hover {
-      transform: translateX(10px);
-    }
-
-    .actions button {
-      margin: 0 5px;
-      padding: 8px 15px;
-      font-size: 14px;
-      background: linear-gradient(90deg, #007acc, #005f99);
-      font-family: 'Amiri', serif; /* تطبيق الخط على الأزرار */
-    }
-
-    .back-button {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: #ff525255;
-    }
-
-    .success-message {
-      color: #00e676;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      z-index: 1000;
       display: none;
-      margin-top: 15px;
-      font-family: 'Amiri', serif; /* تطبيق الخط على الرسائل */
+      max-width: 90%;
     }
 
-    input {
-      font-family: 'Amiri', serif; /* تطبيق الخط على حقول الإدخال */
-      padding: 10px;
-      margin: 10px;
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+      display: none;
+    }
+
+    .modal-header {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #80deea;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      background: #006d9c;
+      border: none;
       border-radius: 8px;
-      border: 1px solid #005f99;
-      background: #005f9933;
       color: white;
+      font-size: 16px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .modal-button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-confirm {
+      background: #00c853;
+    }
+
+    .modal-cancel {
+      background: #ff1744;
     }
   </style>
 </head>
 <body>
-  <button class="back-button" onclick="window.location.href='index.html'">← رجوع</button>
+  <!-- ... (بقية الbody كما هي) ... -->
 
-  <div class="container">
-    <h1>إدارة قاعدة الزبائن</h1>
-    <p>يمكنك إضافة زبون جديد أو اختيار من القائمة</p>
-
-    <div class="add-section">
-      <input type="text" id="customerName" placeholder="اسم الزبون الجديد">
-      <button onclick="addCustomer()">➕ إضافة زبون</button>
+  <!-- إضافة عناصر الرسائل المخصصة -->
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  
+  <div class="custom-modal" id="editModal">
+    <div class="modal-header">تعديل اسم الزبون</div>
+    <input type="text" id="editInput" class="modal-input">
+    <div class="modal-buttons">
+      <button class="modal-button modal-confirm" onclick="confirmEdit()">حفظ</button>
+      <button class="modal-button modal-cancel" onclick="closeModals()">إلغاء</button>
     </div>
+  </div>
 
-    <div class="customer-list" id="customerList">
-      <!-- سيتم ملؤها بالزبائن من localStorage -->
+  <div class="custom-modal" id="deleteModal">
+    <div class="modal-header">⚠️ تأكيد الحذف</div>
+    <p>هل أنت متأكد من رغبتك في حذف هذا الزبون؟</p>
+    <div class="modal-buttons">
+      <button class="modal-button modal-confirm" onclick="confirmDelete()">نعم</button>
+      <button class="modal-button modal-cancel" onclick="closeModals()">لا</button>
     </div>
-
-    <p class="success-message" id="successMessage">✅ تمت العملية بنجاح</p>
   </div>
 
   <script>
-    // بيانات الزبائن
-    let customers = JSON.parse(localStorage.getItem('customers')) || [];
+    // متغيرات عامة
+    let currentEditIndex = null;
 
-    // عرض الزبائن
-    function renderCustomers() {
-      const list = document.getElementById('customerList');
-      list.innerHTML = customers.map((customer, index) => `
-        <div class="customer-card">
-          <span>${customer.name} - #${customer.id}</span>
-          <div class="actions">
-            <button onclick="editCustomer(${index})">✏️ تعديل</button>
-            <button onclick="deleteCustomer(${index})">🗑️ حذف</button>
-            <button onclick="selectCustomer(${index})">✅ اختيار</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // إضافة زبون
-    function addCustomer() {
-      const nameInput = document.getElementById('customerName');
-      if (nameInput.value.trim()) {
-        const newCustomer = {
-          id: Date.now(),
-          name: nameInput.value.trim()
-        };
-        customers.push(newCustomer);
-        localStorage.setItem('customers', JSON.stringify(customers));
-        renderCustomers();
-        showSuccess('تمت إضافة الزبون بنجاح');
-        nameInput.value = '';
-      }
-    }
-
-    // تعديل الزبون
+    // عرض نافذة التعديل
     function editCustomer(index) {
-      const newName = prompt('أدخل الاسم الجديد:', customers[index].name);
-      if (newName) {
-        customers[index].name = newName.trim();
+      currentEditIndex = index;
+      document.getElementById('editInput').value = customers[index].name;
+      showModal('editModal');
+    }
+
+    // تأكيد التعديل
+    function confirmEdit() {
+      if (document.getElementById('editInput').value.trim()) {
+        customers[currentEditIndex].name = document.getElementById('editInput').value.trim();
         localStorage.setItem('customers', JSON.stringify(customers));
         renderCustomers();
         showSuccess('تم التعديل بنجاح');
+        closeModals();
       }
     }
 
-    // حذف الزبون
+    // عرض نافذة الحذف
     function deleteCustomer(index) {
-      if (confirm('هل أنت متأكد من الحذف؟')) {
-        customers.splice(index, 1);
-        localStorage.setItem('customers', JSON.stringify(customers));
-        renderCustomers();
-        showSuccess('تم الحذف بنجاح');
-      }
+      currentEditIndex = index;
+      showModal('deleteModal');
     }
 
-    // اختيار زبون
-    function selectCustomer(index) {
-      localStorage.setItem('selectedCustomer', JSON.stringify(customers[index]));
-      showSuccess('تم اختيار الزبون');
-      setTimeout(() => {
-        window.location.href = 'clothing-categories.html';
-      }, 1000);
+    // تأكيد الحذف
+    function confirmDelete() {
+      customers.splice(currentEditIndex, 1);
+      localStorage.setItem('customers', JSON.stringify(customers));
+      renderCustomers();
+      showSuccess('تم الحذف بنجاح');
+      closeModals();
     }
 
-    // رسائل النجاح
-    function showSuccess(message) {
-      const successEl = document.getElementById('successMessage');
-      successEl.textContent = `✅ ${message}`;
-      successEl.style.display = 'block';
-      setTimeout(() => successEl.style.display = 'none', 2000);
+    // إدارة النوافذ
+    function showModal(modalId) {
+      document.getElementById('modalBackdrop').style.display = 'block';
+      document.getElementById(modalId).style.display = 'block';
     }
 
-    // التحميل الأولي
-    renderCustomers();
+    function closeModals() {
+      document.querySelectorAll('.custom-modal').forEach(modal => {
+        modal.style.display = 'none';
+      });
+      document.getElementById('modalBackdrop').style.display = 'none';
+      currentEditIndex = null;
+    }
+
+    // إغلاق النوافذ بالنقر خارجها
+    document.getElementById('modalBackdrop').addEventListener('click', closeModals);
   </script>
 </body>
 </html>

@@ -3,288 +3,231 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>فئات الملابس - مصبنة مشاء الله</title>
+  <title>اختيار الملابس - مصبنة مشاء الله</title>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* الأنماط المعدلة */
+    /* أنماط عامة */
     body {
       margin: 0;
       padding: 0;
       font-family: 'Amiri', serif;
-      background: linear-gradient(135deg, #002b4d, #004c6d);
-      color: #ffffff;
-      min-height: 100vh;
-      position: relative;
-      display: flex;
+      background: #f5f5f5;
+      color: #333;
     }
 
-    .main-content {
-      flex: 1;
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
       padding: 20px;
     }
 
-    .sidebar {
-      width: 350px;
-      background: #003954dd;
-      border-left: 1px solid #005f99;
-      padding: 20px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-    }
-
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      margin: 40px 0;
-    }
-
-    .category-card {
-      background: #005f9955;
+    /* تصميم الفئات */
+    .category-section {
+      background: white;
       border-radius: 15px;
-      padding: 25px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
     }
 
-    .category-card.active {
-      border-color: #00e676;
-      box-shadow: 0 8px 25px rgba(0, 230, 118, 0.3);
+    .category-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
     .category-icon {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 15px;
-      object-fit: contain;
+      width: 60px;
+      height: 60px;
+      margin-left: 15px;
     }
 
-    .items-section {
-      margin-top: 30px;
-      border-top: 2px solid #005f99;
-      padding-top: 20px;
+    /* تصميم العناصر */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
     }
 
     .item-card {
-      background: #005f9933;
-      padding: 15px;
-      margin: 10px 0;
+      border: 2px solid #eee;
       border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 15px;
+      transition: all 0.3s;
+    }
+
+    .item-card.active {
+      border-color: #007acc;
+      background: #f0f8ff;
+    }
+
+    .item-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
     }
 
     .quantity-controls {
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-top: 15px;
     }
 
     .quantity-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: none;
-      background: #007acc;
-      color: white;
-      cursor: pointer;
-    }
-
-    .cart-floating {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #004a73;
-      padding: 15px 25px;
-      border-radius: 50px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-      cursor: pointer;
-      z-index: 1000;
-    }
-
-    .cart-icon {
       width: 35px;
       height: 35px;
+      border-radius: 50%;
+      border: 1px solid #007acc;
+      background: white;
+      color: #007acc;
+      font-size: 18px;
+      cursor: pointer;
     }
 
-    .cart-counter {
-      background: #00e676;
-      color: #002b4d;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-weight: bold;
+    /* السايدبار */
+    .summary-sidebar {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      width: 300px;
+    }
+
+    .selected-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
     }
 
     .total-price {
-      font-size: 20px;
+      font-size: 24px;
+      color: #007acc;
       margin-top: 20px;
-      color: #00e676;
+      font-weight: bold;
+    }
+
+    .next-btn {
+      background: #007acc;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="main-content">
-    <div class="container">
-      <h1>اختر فئة الملابس</h1>
-      <p>اختر الفئة المناسبة لبدء عملية التسجيل</p>
-
-      <div class="categories-grid">
-        <!-- أيقونات معدلة حسب الطلب -->
-        <div class="category-card" data-category="رجالية">
-          <img src="https://cdn-icons-png.flaticon.com/512/13540/13540227.png" class="category-icon" alt="رجالي">
-          <h3 class="category-title">ملابس رجالية</h3>
-        </div>
-
-        <div class="category-card" data-category="نسائية">
-          <img src="https://cdn-icons-png.flaticon.com/512/3541/3541569.png" class="category-icon" alt="نسائي">
-          <h3 class="category-title">ملابس نسائية</h3>
-        </div>
-
-        <div class="category-card" data-category="أطفال">
-          <img src="https://cdn-icons-png.flaticon.com/512/9752/9752768.png" class="category-icon" alt="أطفال">
-          <h3 class="category-title">ملابس أطفال</h3>
-        </div>
-
-        <div class="category-card" data-category="أفرشة">
-          <img src="https://cdn-icons-png.flaticon.com/512/10828/10828169.png" class="category-icon" alt="فراش">
-          <h3 class="category-title">أغطية الفراش</h3>
-        </div>
+  <div class="container">
+    <!-- قسم الرجالية -->
+    <div class="category-section">
+      <div class="category-header">
+        <img src="https://cdn-icons-png.flaticon.com/512/13540/13540227.png" class="category-icon" alt="رجالي">
+        <h2>ملابس رجالية</h2>
       </div>
-
-      <div class="items-section" id="itemsSection">
-        <!-- سيتم ملؤها بالعناصر حسب الفئة المختارة -->
+      <div class="items-grid" id="mensItems">
+        <!-- العناصر تُضاف بالجافاسكريبت -->
       </div>
     </div>
+
+    <!-- أقسام أخرى بنفس النمط -->
   </div>
 
-  <!-- السايدبار الجانبية لعرض العناصر المختارة -->
-  <div class="sidebar">
-    <h2>🛒 العناصر المختارة</h2>
-    <div id="selectedItemsList"></div>
-    <p class="total-price">المجموع: <span id="totalPrice">0</span> دينار</p>
-    <button onclick="generateInvoice()" class="action-button">إنشاء الفاتورة</button>
+  <!-- السايدبار الجانبية -->
+  <div class="summary-sidebar">
+    <h3>🛒 العناصر المختارة</h3>
+    <div id="selectedItems"></div>
+    <div class="total-price">المجموع: <span id="totalAmount">0</span> DH</div>
+    <button class="next-btn" onclick="goToCustomization()">التالي ➔</button>
   </div>
 
   <script>
-    // بيانات العناصر المحدثة
+    // بيانات العينات
     const itemsData = {
-      'رجالية': [
-        { id: 1, name: 'قميص رسمي', price: 15, image: 'https://cdn-icons-png.flaticon.com/512/13540/13540227.png' },
-        { id: 2, name: 'بنطلون جينز', price: 12, image: 'https://cdn-icons-png.flaticon.com/512/2363/2363763.png' },
-        { id: 3, name: 'جاكيت جلدي', price: 25, image: 'https://cdn-icons-png.flaticon.com/512/3237/3237973.png' }
-      ],
-      'نسائية': [
-        { id: 4, name: 'فستان سهرة', price: 30, image: 'https://cdn-icons-png.flaticon.com/512/3541/3541569.png' },
-        { id: 5, name: 'بلوزة حرير', price: 18, image: 'https://cdn-icons-png.flaticon.com/512/1805/1805984.png' },
-        { id: 6, name: 'تنورة', price: 15, image: 'https://cdn-icons-png.flaticon.com/512/1997/1997920.png' }
-      ],
-      'أطفال': [
-        { id: 7, name: 'بيجاما أطفال', price: 10, image: 'https://cdn-icons-png.flaticon.com/512/9752/9752768.png' },
-        { id: 8, name: 'جوارب', price: 5, image: 'https://cdn-icons-png.flaticon.com/512/9752/9752870.png' },
-        { id: 9, name: 'كنزة', price: 12, image: 'https://cdn-icons-png.flaticon.com/512/9752/9752923.png' }
-      ],
-      'أفرشة': [
-        { id: 10, name: 'غطاء وسادة', price: 8, image: 'https://cdn-icons-png.flaticon.com/512/10828/10828169.png' },
-        { id: 11, name: 'شرشف سرير', price: 15, image: 'https://cdn-icons-png.flaticon.com/512/10828/10828170.png' },
-        { id: 12, name: 'بطانية', price: 20, image: 'https://cdn-icons-png.flaticon.com/512/10828/10828173.png' }
+      mens: [
+        { id: 1, name: 'قميص رسمي', price: 45, image: 'https://example.com/shirt.jpg' },
+        { id: 2, name: 'بنطلون جينز', price: 60, image: 'https://example.com/jeans.jpg' },
+        { id: 3, name: 'جاكيت جلدي', price: 120, image: 'https://example.com/jacket.jpg' }
       ]
     };
 
-    let selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
+    let selectedItems = [];
 
-    // تحديث الواجهة
-    function updateUI() {
-      // تحديث السايدبار
-      const selectedList = document.getElementById('selectedItemsList');
-      selectedList.innerHTML = selectedItems.map(item => `
-        <div class="item-card">
-          <div>
-            <img src="${item.image}" width="40" style="vertical-align:middle">
-            ${item.name} (${item.quantity}x)
+    // إنشاء عناصر القائمة
+    function renderItems() {
+      const container = document.getElementById('mensItems');
+      container.innerHTML = itemsData.mens.map(item => `
+        <div class="item-card" data-id="${item.id}">
+          <img src="${item.image}" class="item-image" alt="${item.name}">
+          <h3>${item.name}</h3>
+          <p>السعر: ${item.price} DH</p>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+            <span id="qty-${item.id}">0</span>
+            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
           </div>
-          <span>${item.price * item.quantity} دينار</span>
         </div>
       `).join('');
-
-      // تحديث المجموع
-      document.getElementById('totalPrice').textContent = 
-        selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-      // تحديث العداد
-      document.getElementById('cartCounter').textContent = selectedItems.length;
     }
 
-    // إضافة/إزالة العناصر
-    function handleItem(action, itemId) {
-      const item = itemsData[currentCategory].find(i => i.id === itemId);
+    // تحديث الكمية
+    function updateQuantity(itemId, change) {
+      const item = itemsData.mens.find(i => i.id === itemId);
       const index = selectedItems.findIndex(i => i.id === itemId);
 
-      if (action === 'add') {
-        if (index === -1) {
-          selectedItems.push({ ...item, quantity: 1 });
-        } else {
-          selectedItems[index].quantity++;
-        }
-      } else if (action === 'remove') {
-        if (selectedItems[index].quantity > 1) {
-          selectedItems[index].quantity--;
-        } else {
+      if (index === -1 && change > 0) {
+        selectedItems.push({ ...item, quantity: 1 });
+      } else {
+        selectedItems[index].quantity += change;
+        if (selectedItems[index].quantity < 1) {
           selectedItems.splice(index, 1);
         }
       }
 
-      localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-      updateUI();
+      updateSelectionDisplay();
     }
 
-    // إنشاء الفاتورة
-    function generateInvoice() {
-      if (selectedItems.length === 0) {
-        alert('يرجى إضافة عناصر أولاً');
-        return;
-      }
-      window.location.href = 'invoice.html';
-    }
-
-    // تفعيل الأزرار
-    document.querySelectorAll('.category-card').forEach(card => {
-      card.addEventListener('click', function() {
-        const category = this.dataset.category;
-        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        
-        // عرض العناصر
-        document.getElementById('itemsSection').innerHTML = `
-          <h3>${category} - اختر العناصر</h3>
-          <div class="items-grid">
-            ${itemsData[category].map(item => `
-              <div class="item-card">
-                <div>
-                  <img src="${item.image}" width="50">
-                  ${item.name} - ${item.price} دينار
-                </div>
-                <div class="quantity-controls">
-                  <button class="quantity-btn" onclick="handleItem('remove', ${item.id})">-</button>
-                  <span>${selectedItems.find(i => i.id === item.id)?.quantity || 0}</span>
-                  <button class="quantity-btn" onclick="handleItem('add', ${item.id})">+</button>
-                </div>
-              </div>
-            `).join('')}
+    // تحديث العرض
+    function updateSelectionDisplay() {
+      // تحديث السايدبار
+      const selectedContainer = document.getElementById('selectedItems');
+      selectedContainer.innerHTML = selectedItems.map(item => `
+        <div class="selected-item">
+          <div>
+            <b>${item.name}</b><br>
+            <small>${item.quantity} x ${item.price} DH</small>
           </div>
-        `;
+          <span>${item.quantity * item.price} DH</span>
+        </div>
+      `).join('');
+
+      // تحديث المجموع
+      const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      document.getElementById('totalAmount').textContent = total;
+
+      // تحديث العدادات
+      selectedItems.forEach(item => {
+        document.getElementById(`qty-${item.id}`).textContent = item.quantity;
       });
-    });
+    }
+
+    // الانتقال للصفحة التالية
+    function goToCustomization() {
+      localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+      window.location.href = 'customize-page.html';
+    }
 
     // التحميل الأولي
-    updateUI();
+    renderItems();
   </script>
 </body>
 </html>

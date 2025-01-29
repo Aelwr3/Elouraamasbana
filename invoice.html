@@ -18,8 +18,6 @@
             font-family: 'Amiri', serif;
             background: #f5f5f5;
             color: var(--text-color);
-            position: relative;
-            overflow-x: hidden;
         }
 
         .invoice-container {
@@ -29,7 +27,6 @@
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            animation: floatInvoice 3s ease-in-out infinite;
         }
 
         .header-section {
@@ -43,11 +40,6 @@
 
         .logo {
             width: 100px;
-            animation: grabHand 2s ease-in-out;
-        }
-
-        .invoice-info {
-            text-align: right;
         }
 
         .items-table {
@@ -74,73 +66,65 @@
             font-size: 20px;
         }
 
-        .actions {
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
             margin-top: 40px;
-            text-align: center;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
         }
 
         .print-btn {
             background: var(--secondary-color);
             color: var(--primary-color);
-            padding: 15px 40px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
         }
 
-        .hand-animation {
+        .back-btn {
+            background: #ff5252;
+            color: white;
+        }
+
+        .save-btn {
+            background: #007acc;
+            color: white;
+        }
+
+        .notification {
             position: fixed;
-            bottom: -50px;
-            right: -50px;
-            width: 200px;
-            animation: moveHand 10s linear forwards;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideDown 0.5s ease-out;
         }
 
-        @keyframes floatInvoice {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes moveHand {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-100vw, -100vh) rotate(360deg); }
+        @keyframes slideDown {
+            0% { top: -50px; }
+            100% { top: 20px; }
         }
 
         @media print {
-            .actions, .back-button, .hand-animation {
+            .action-buttons {
                 display: none !important;
             }
-        }
-
-        .back-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #ff5252;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 30px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .countdown {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: var(--primary-color);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
         }
     </style>
 </head>
 <body>
-    <a class="back-button" href="customization.html">← الرجوع للتعديل</a>
-    <div class="countdown" id="countdown">10</div>
-
     <div class="invoice-container">
         <div class="header-section">
             <div class="invoice-info">
@@ -173,14 +157,14 @@
             <p>المجموع الكلي: <span id="totalAmount">0</span> درهم</p>
         </div>
 
-        <div class="actions">
-            <button class="print-btn" onclick="window.print()">🖨️ طباعة الفاتورة</button>
+        <div class="action-buttons">
+            <button class="action-btn back-btn" onclick="goBack()">← الرجوع</button>
+            <button class="action-btn print-btn" onclick="window.print()">🖨️ طباعة</button>
+            <button class="action-btn save-btn" onclick="saveInvoice()">💾 حفظ</button>
         </div>
     </div>
 
-    <img src="https://cdn-icons-png.flaticon.com/512/3466/3466901.png" 
-         class="hand-animation" 
-         alt="يد تمسك الفاتورة">
+    <div class="notification" id="notification"></div>
 
     <script>
         // توليد بيانات الفاتورة
@@ -206,31 +190,38 @@
             document.getElementById('totalAmount').textContent = total;
         }
 
-        // العد التنازلي التلقائي
-        let seconds = 10;
-        const countdownElement = document.getElementById('countdown');
-        const timer = setInterval(() => {
-            seconds--;
-            countdownElement.textContent = seconds;
+        // نظام الإشعارات
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
             
-            if(seconds <= 0) {
-                clearInterval(timer);
-                if(confirm('⚠️ سيتم تحويلك لصفحة الدفع خلال 3 ثواني')) {
-                    setTimeout(() => {
-                        window.location.href = 'payment.html';
-                    }, 3000);
-                }
-            }
-        }, 1000);
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
 
-        // إلغاء العد التنازلي عند الرجوع
-        document.querySelector('.back-button').addEventListener('click', () => {
-            clearInterval(timer);
-            localStorage.removeItem('selectedItems');
-        });
+        // الانتقال للخلف
+        function goBack() {
+            window.history.back();
+        }
+
+        // حفظ الفاتورة
+        function saveInvoice() {
+            showNotification('تم حفظ الفاتورة بنجاح', 'success');
+            // إضافة منطق الحفظ هنا
+        }
 
         // التحميل الأولي
         generateInvoice();
+
+        // الانتقال التلقائي بعد 10 ثواني
+        setTimeout(() => {
+            showNotification('سيتم تحويلك لصفحة الدفع خلال 3 ثواني', 'warning');
+            setTimeout(() => {
+                window.location.href = 'payment.html';
+            }, 3000);
+        }, 10000);
     </script>
 </body>
 </html>

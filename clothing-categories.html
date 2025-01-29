@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تخصيص العناصر - مصبنة مشاء الله</title>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet>
+    <title>اختيار الملابس - مصبنة مشاء الله</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* أنماط الخطوط العامة */
+        * {
+            font-family: 'Amiri', serif !important;
+        }
+
         :root {
             --primary-bg: #002b4d;
             --secondary-bg: #003954;
@@ -19,79 +24,11 @@
             background: linear-gradient(135deg, var(--primary-bg), #004c6d);
             color: var(--text-color);
             min-height: 100vh;
-            font-family: 'Amiri', serif;
+            position: relative;
+            padding-bottom: 80px;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .customization-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--secondary-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-            margin-bottom: 30px;
-        }
-
-        .customization-table th,
-        .customization-table td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #ffffff20;
-        }
-
-        .customization-table th {
-            background: var(--accent-color);
-            color: var(--primary-bg);
-        }
-
-        .customization-table input {
-            width: 80px;
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid #ffffff50;
-            background: #ffffff15;
-            color: var(--text-color);
-            text-align: center;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .action-btn {
-            padding: 12px 30px;
-            border-radius: 30px;
-            border: none;
-            cursor: pointer;
-            font-family: 'Amiri', serif;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .save-btn {
-            background: var(--accent-color);
-            color: var(--primary-bg);
-        }
-
-        .delete-btn {
-            background: #ff5252;
-            color: white;
-        }
-
-        .total-box {
-            text-align: center;
-            font-size: 24px;
-            margin: 25px 0;
-            color: var(--accent-color);
-        }
-
+        /* زر الرجوع */
         .back-button {
             position: fixed;
             bottom: 20px;
@@ -106,127 +43,224 @@
             font-size: 18px;
         }
 
-        /* أنماط الإشعارات المخصصة */
-        .custom-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 30px;
-            z-index: 1000;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            animation: slideIn 0.5s ease-out;
+        /* أزرار الفئات */
+        .category-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        @keyframes slideIn {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(0); }
+        .category-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .category-btn img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .category-btn.active {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+        }
+
+        /* قائمة العناصر */
+        .clothing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .clothing-item {
+            background: #005f9955;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        .clothing-item.selected {
+            border-color: var(--accent-color);
+            background: #007acc33;
+        }
+
+        /* السايدبار */
+        .summary-sidebar {
+            background: var(--secondary-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            position: sticky;
+            top: 20px;
+        }
+
+        .next-btn {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .total-box {
+            font-size: 20px;
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>تخصيص العناصر المختارة</h1>
-        
-        <table class="customization-table">
-            <thead>
-                <tr>
-                    <th>اسم العنصر</th>
-                    <th>السعر للقطعة (DH)</th>
-                    <th>الكمية</th>
-                    <th>المجموع</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="itemsTable"></tbody>
-        </table>
+        <div class="category-tabs">
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="رجالية">
+                    <img src="https://cdn-icons-png.flaticon.com/512/13540/13540227.png" alt="رجالي">
+                    رجالية
+                </button>
+                <button class="category-btn" data-category="نسائية">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3541/3541569.png" alt="نسائي">
+                    نسائية
+                </button>
+                <button class="category-btn" data-category="أطفال">
+                    <img src="https://cdn-icons-png.flaticon.com/512/9752/9752768.png" alt="أطفال">
+                    أطفال
+                </button>
+                <button class="category-btn" data-category="أفرشة">
+                    <img src="https://cdn-icons-png.flaticon.com/512/10828/10828169.png" alt="أفرشة">
+                    أفرشة
+                </button>
+            </div>
 
-        <div class="total-box">
-            المجموع الكلي: <span id="grandTotal">0</span> DH
+            <div class="clothing-grid" id="clothingItems">
+                <!-- سيتم ملؤها بالجافاسكريبت -->
+            </div>
         </div>
 
-        <div class="controls">
-            <button class="action-btn save-btn" onclick="saveChanges()">💾 حفظ التغييرات</button>
+        <div class="summary-sidebar">
+            <h3>🛍️ العناصر المختارة</h3>
+            <div id="selectedItems"></div>
+            <div class="total-box">
+                المجموع: <span id="totalAmount">0</span> DH
+            </div>
+            <button class="next-btn" onclick="goToCustomization()">التالي ➔</button>
         </div>
     </div>
 
     <button class="back-button" onclick="window.history.back()">← الرجوع</button>
 
     <script>
-        // تحميل البيانات من localStorage
-        let selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
+        // بيانات العينات
+        const clothingData = {
+            'رجالية': [
+                { id: 1, name: 'قميص رسمي', price: 45 },
+                { id: 2, name: 'بنطلون جينز', price: 60 }
+            ],
+            'نسائية': [
+                { id: 3, name: 'فستان سهرة', price: 80 }
+            ],
+            'أطفال': [
+                { id: 4, name: 'بيجاما أطفال', price: 35 }
+            ],
+            'أفرشة': [
+                { id: 5, name: 'غطاء وسادة', price: 20 },
+                { id: 6, name: 'شرشف سرير', price: 45 }
+            ]
+        };
 
-        // عرض الجدول
-        function renderTable() {
-            const tableBody = document.getElementById('itemsTable');
-            tableBody.innerHTML = selectedItems.map((item, index) => `
-                <tr>
-                    <td><input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)"></td>
-                    <td><input type="number" value="${item.price}" min="1" oninput="updateItem(${index}, 'price', this.value)"></td>
-                    <td><input type="number" value="${item.quantity}" min="1" oninput="updateItem(${index}, 'quantity', this.value)"></td>
-                    <td>${item.price * item.quantity} DH</td>
-                    <td>
-                        <button class="action-btn delete-btn" onclick="deleteItem(${index})">🗑️ حذف</button>
-                    </td>
-                </tr>
+        let selectedItems = [];
+        let currentCategory = 'رجالية';
+
+        // تفعيل أزرار الفئات
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // إزالة النشاط من جميع الأزرار
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                
+                // تفعيل الزر المختار
+                this.classList.add('active');
+                
+                // تحديث الفئة الحالية
+                currentCategory = this.dataset.category;
+                
+                // إعادة عرض العناصر
+                renderItems();
+            });
+        });
+
+        // عرض العناصر
+        function renderItems() {
+            const container = document.getElementById('clothingItems');
+            const items = clothingData[currentCategory];
+            
+            container.innerHTML = items.map(item => `
+                <div class="clothing-item ${selectedItems.some(i => i.id === item.id) ? 'selected' : ''}" 
+                     onclick="toggleSelection(${item.id})">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">${item.price} DH</div>
+                </div>
+            `).join('');
+        }
+
+        // تبديل اختيار العنصر
+        function toggleSelection(itemId) {
+            const item = clothingData[currentCategory].find(i => i.id === itemId);
+            const index = selectedItems.findIndex(i => i.id === itemId);
+
+            if (index === -1) {
+                selectedItems.push({ ...item, quantity: 1 });
+            } else {
+                selectedItems.splice(index, 1);
+            }
+
+            updateSummary();
+            renderItems();
+        }
+
+        // تحديث الملخص
+        function updateSummary() {
+            const container = document.getElementById('selectedItems');
+            container.innerHTML = selectedItems.map(item => `
+                <div class="selected-item">
+                    <span>${item.name}</span>
+                    <span>${item.price} DH</span>
+                </div>
             `).join('');
 
-            updateGrandTotal();
+            document.getElementById('totalAmount').textContent = 
+                selectedItems.reduce((sum, item) => sum + item.price, 0);
         }
 
-        // تحديث العنصر
-        function updateItem(index, field, value) {
-            if (field === 'price' || field === 'quantity') {
-                value = Math.max(1, Number(value));
-            }
-            selectedItems[index][field] = value;
-            renderTable();
-        }
-
-        // حذف العنصر
-        function deleteItem(index) {
-            if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
-                selectedItems.splice(index, 1);
-                showNotification('تم الحذف بنجاح', false);
-                renderTable();
-            }
-        }
-
-        // تحديث المجموع الكلي
-        function updateGrandTotal() {
-            const grandTotal = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('grandTotal').textContent = grandTotal;
-        }
-
-        // حفظ التغييرات
-        function saveChanges() {
+        // الانتقال للتخصيص
+        function goToCustomization() {
             if (selectedItems.length === 0) {
-                showNotification('الرجاء إضافة عناصر أولاً', true);
+                alert('❗ الرجاء اختيار عنصر واحد على الأقل');
                 return;
             }
             
             localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-            showNotification('تم الحفظ بنجاح', false);
-        }
-
-        // نظام الإشعارات المخصص
-        function showNotification(message, isError) {
-            const notification = document.createElement('div');
-            notification.className = 'custom-notification';
-            notification.textContent = message;
-            notification.style.background = isError ? '#ff5252' : '#00e676';
-            notification.style.color = isError ? 'white' : '#002b4d';
-
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+            window.location.href = 'customization.html';
         }
 
         // التحميل الأولي
-        renderTable();
+        renderItems();
     </script>
 </body>
 </html>

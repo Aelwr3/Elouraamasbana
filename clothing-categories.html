@@ -209,25 +209,253 @@
           <span>${item.quantity * item.price} DH</span>
         </div>
       `).join('');
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختيار الملابس - مصبنة مشاء الله</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* أنماط عامة */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Amiri', serif;
+            background: #f8f9fa;
+        }
 
-      // تحديث المجموع
-      const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      document.getElementById('totalAmount').textContent = total;
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
 
-      // تحديث العدادات
-      selectedItems.forEach(item => {
-        document.getElementById(`qty-${item.id}`).textContent = item.quantity;
-      });
-    }
+        /* قسم العناصر */
+        .items-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
 
-    // الانتقال للصفحة التالية
-    function goToCustomization() {
-      localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-      window.location.href = 'customize-page.html';
-    }
+        .category-title {
+            color: #2c3e50;
+            border-right: 4px solid #007acc;
+            padding-right: 15px;
+            margin-bottom: 25px;
+        }
 
-    // التحميل الأولي
-    renderItems();
-  </script>
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            border-color: #007acc;
+            transform: translateY(-3px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .item-price {
+            color: #27ae60;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1px solid #007acc;
+            background: none;
+            color: #007acc;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* سايدبار الملخص */
+        .summary-sidebar {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total-section {
+            margin-top: 25px;
+            font-size: 20px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            background: #007acc;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .next-btn:hover {
+            background: #005f99;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- قسم العناصر الرئيسي -->
+        <div class="items-section">
+            <h2 class="category-title">ملابس رجالية</h2>
+            <div class="items-grid" id="itemsContainer">
+                <!-- العناصر تُضاف بواسطة الجافاسكريبت -->
+            </div>
+        </div>
+
+        <!-- سايدبار الملخص -->
+        <div class="summary-sidebar">
+            <h3>العناصر المختارة</h3>
+            <div id="selectedItems"></div>
+            <div class="total-section">
+                المجموع: <span id="totalPrice">0</span> DH
+            </div>
+            <button class="next-btn" onclick="proceedToCustomization()">التالي ➔</button>
+        </div>
+    </div>
+
+    <script>
+        // بيانات العينات
+        const items = [
+            {
+                id: 1,
+                name: "قميص رسمي",
+                price: 45,
+                image: "https://via.placeholder.com/250x180/007acc/fff?text=قميص"
+            },
+            {
+                id: 2,
+                name: "بنطلون جينز",
+                price: 60,
+                image: "https://via.placeholder.com/250x180/007acc/fff?text=جينز"
+            },
+            {
+                id: 3,
+                name: "جاكيت جلدي",
+                price: 120,
+                image: "https://via.placeholder.com/250x180/007acc/fff?text=جاكيت"
+            }
+        ];
+
+        let selectedItems = [];
+
+        // عرض العناصر
+        function renderItems() {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = items.map(item => `
+                <div class="item-card">
+                    <img src="${item.image}" class="item-image" alt="${item.name}">
+                    <h3>${item.name}</h3>
+                    <p class="item-price">${item.price} DH</p>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <span id="qty-${item.id}">0</span>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // تحديث الكمية
+        function updateQuantity(itemId, change) {
+            const item = items.find(i => i.id === itemId);
+            const existing = selectedItems.find(i => i.id === itemId);
+
+            if (existing) {
+                existing.quantity += change;
+                if (existing.quantity < 1) {
+                    selectedItems = selectedItems.filter(i => i.id !== itemId);
+                }
+            } else if (change > 0) {
+                selectedItems.push({ ...item, quantity: 1 });
+            }
+
+            updateSummary();
+        }
+
+        // تحديث الملخص
+        function updateSummary() {
+            const container = document.getElementById('selectedItems');
+            container.innerHTML = selectedItems.map(item => `
+                <div class="selected-item">
+                    <div>${item.name}</div>
+                    <div>
+                        <span>${item.quantity} x ${item.price} DH</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // تحديث المجموع
+            const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalPrice').textContent = total;
+
+            // تحديث العدادات
+            selectedItems.forEach(item => {
+                document.getElementById(`qty-${item.id}`).textContent = item.quantity;
+            });
+        }
+
+        // الانتقال لصفحة التخصيص
+        function proceedToCustomization() {
+            if (selectedItems.length === 0) {
+                alert("الرجاء اختيار عنصر واحد على الأقل");
+                return;
+            }
+            
+            localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+            window.location.href = 'customization.html';
+        }
+
+        // التحميل الأولي
+        renderItems();
+    </script>
 </body>
 </html>

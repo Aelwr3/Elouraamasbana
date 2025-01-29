@@ -167,6 +167,15 @@
     <div class="notification" id="notification"></div>
 
     <script>
+        // توليد رقم فاتورة فريد
+        let invoiceNumber = localStorage.getItem('currentInvoiceNumber') || generateInvoiceNumber();
+
+        function generateInvoiceNumber() {
+            const newNumber = 'INV-' + Date.now().toString().slice(-6);
+            localStorage.setItem('currentInvoiceNumber', newNumber);
+            return newNumber;
+        }
+
         // توليد بيانات الفاتورة
         function generateInvoice() {
             const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
@@ -174,7 +183,7 @@
 
             document.getElementById('customerName').textContent = customer.name;
             document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString();
-            document.getElementById('invoiceNumber').textContent = '#' + Date.now().toString().slice(-6);
+            document.getElementById('invoiceNumber').textContent = invoiceNumber;
 
             const itemsContainer = document.getElementById('invoiceItems');
             itemsContainer.innerHTML = items.map(item => `
@@ -208,20 +217,30 @@
 
         // حفظ الفاتورة
         function saveInvoice() {
-            showNotification('تم حفظ الفاتورة بنجاح', 'success');
-            // إضافة منطق الحفظ هنا
+            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+            invoices.push({
+                number: invoiceNumber,
+                items: JSON.parse(localStorage.getItem('selectedItems')),
+                total: document.getElementById('totalAmount').textContent,
+                date: new Date().toISOString()
+            });
+            
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            showNotification('تم حفظ الفاتورة رقم ' + invoiceNumber, 'success');
+            localStorage.removeItem('currentInvoiceNumber');
+            invoiceNumber = generateInvoiceNumber();
         }
-
-        // التحميل الأولي
-        generateInvoice();
 
         // الانتقال التلقائي بعد 10 ثواني
         setTimeout(() => {
-            showNotification('سيتم تحويلك لصفحة الدفع خلال 3 ثواني', 'warning');
+            showNotification('⚠️ سيتم تحويلك لصفحة الدفع خلال 3 ثواني');
             setTimeout(() => {
                 window.location.href = 'payment.html';
             }, 3000);
         }, 10000);
+
+        // التحميل الأولي
+        generateInvoice();
     </script>
 </body>
 </html>

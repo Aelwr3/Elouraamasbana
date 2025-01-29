@@ -10,6 +10,7 @@
             --primary-color: #002b4d;
             --secondary-color: #00e676;
             --text-color: #333;
+            --warning-color: #ff5252;
         }
 
         body {
@@ -18,6 +19,7 @@
             font-family: 'Amiri', serif;
             background: #f5f5f5;
             color: var(--text-color);
+            position: relative;
         }
 
         .invoice-container {
@@ -27,6 +29,8 @@
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .header-section {
@@ -81,6 +85,7 @@
             font-size: 16px;
             font-weight: bold;
             transition: 0.3s;
+            min-width: 120px;
         }
 
         .print-btn {
@@ -89,7 +94,7 @@
         }
 
         .back-btn {
-            background: #ff5252;
+            background: var(--warning-color);
             color: white;
         }
 
@@ -98,27 +103,42 @@
             color: white;
         }
 
-        .notification {
+        .warning-overlay {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff3cd;
-            color: #856404;
-            padding: 15px 30px;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
             display: none;
-            animation: slideDown 0.5s ease-out;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
         }
 
-        @keyframes slideDown {
-            0% { top: -50px; }
-            100% { top: 20px; }
+        .warning-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .warning-timer {
+            font-size: 24px;
+            color: var(--warning-color);
+            margin: 15px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @media print {
-            .action-buttons {
+            .action-buttons, .warning-overlay {
                 display: none !important;
             }
         }
@@ -164,26 +184,37 @@
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
+    <div class="warning-overlay" id="warningOverlay">
+        <div class="warning-box">
+            <h3>⚠️ تنبيه هام!</h3>
+            <p>بعد الانتقال للدفع لن تتمكن من تعديل الفاتورة</p>
+            <div class="warning-timer" id="warningTimer">10</div>
+            <div class="action-buttons">
+                <button class="action-btn back-btn" onclick="cancelRedirect()">إلغاء</button>
+                <button class="action-btn print-btn" onclick="proceedToPayment()">متابعة</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // توليد رقم فاتورة فريد
-        let invoiceNumber = localStorage.getItem('currentInvoiceNumber') || generateInvoiceNumber();
+        // إدارة أرقام الفواتير
+        let lastInvoiceNumber = localStorage.getItem('lastInvoiceNumber') || 1000;
+        let currentInvoiceNumber = ++lastInvoiceNumber;
+        localStorage.setItem('lastInvoiceNumber', currentInvoiceNumber);
 
-        function generateInvoiceNumber() {
-            const newNumber = 'INV-' + Date.now().toString().slice(-6);
-            localStorage.setItem('currentInvoiceNumber', newNumber);
-            return newNumber;
-        }
+        // إدارة المؤقتات
+        let warningTimer;
+        let redirectTimer;
+        let countdown = 10;
 
-        // توليد بيانات الفاتورة
+        // توليد الفاتورة
         function generateInvoice() {
             const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
             const customer = JSON.parse(localStorage.getItem('selectedCustomer')) || { name: 'عميل جديد' };
 
-            document.getElementById('customerName').textContent = customer.name;
             document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString();
-            document.getElementById('invoiceNumber').textContent = invoiceNumber;
+            document.getElementById('invoiceNumber').textContent = `INV-${currentInvoiceNumber}`;
+            document.getElementById('customerName').textContent = customer.name;
 
             const itemsContainer = document.getElementById('invoiceItems');
             itemsContainer.innerHTML = items.map(item => `
@@ -199,18 +230,31 @@
             document.getElementById('totalAmount').textContent = total;
         }
 
-        // نظام الإشعارات
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.style.display = 'block';
+        // عرض تحذير الانتقال
+        function showPaymentWarning() {
+            const overlay = document.getElementById('warningOverlay');
+            overlay.style.display = 'flex';
             
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+            warningTimer = setInterval(() => {
+                document.getElementById('warningTimer').textContent = --countdown;
+                if(countdown <= 0) proceedToPayment();
+            }, 1000);
         }
 
-        // الانتقال للخلف
+        // الانتقال لصفحة الدفع
+        function proceedToPayment() {
+            clearInterval(warningTimer);
+            localStorage.removeItem('selectedItems');
+            window.location.href = 'payment.html';
+        }
+
+        // إلغاء الانتقال
+        function cancelRedirect() {
+            clearInterval(warningTimer);
+            document.getElementById('warningOverlay').style.display = 'none';
+        }
+
+        // الرجوع للصفحة السابقة
         function goBack() {
             window.history.back();
         }
@@ -219,28 +263,20 @@
         function saveInvoice() {
             const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
             invoices.push({
-                number: invoiceNumber,
+                number: currentInvoiceNumber,
                 items: JSON.parse(localStorage.getItem('selectedItems')),
                 total: document.getElementById('totalAmount').textContent,
                 date: new Date().toISOString()
             });
-            
             localStorage.setItem('invoices', JSON.stringify(invoices));
-            showNotification('تم حفظ الفاتورة رقم ' + invoiceNumber, 'success');
-            localStorage.removeItem('currentInvoiceNumber');
-            invoiceNumber = generateInvoiceNumber();
+            alert('تم حفظ الفاتورة بنجاح!');
         }
 
-        // الانتقال التلقائي بعد 10 ثواني
-        setTimeout(() => {
-            showNotification('⚠️ سيتم تحويلك لصفحة الدفع خلال 3 ثواني');
-            setTimeout(() => {
-                window.location.href = 'payment.html';
-            }, 3000);
-        }, 10000);
-
-        // التحميل الأولي
-        generateInvoice();
+        // بدء التشغيل
+        window.addEventListener('load', () => {
+            generateInvoice();
+            setTimeout(showPaymentWarning, 5000); // عرض التحذير بعد 5 ثواني
+        });
     </script>
 </body>
 </html>

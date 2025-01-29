@@ -183,13 +183,11 @@
             renderTable();
         }
 
-        // حذف العنصر
+        // حذف العنصر (بدون تأكيد)
         function deleteItem(index) {
-            if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
-                selectedItems.splice(index, 1);
-                showNotification('تم الحذف بنجاح', false);
-                renderTable();
-            }
+            selectedItems.splice(index, 1);
+            showNotification('تم الحذف بنجاح', false);
+            renderTable();
         }
 
         // تحديث المجموع الكلي
@@ -198,7 +196,7 @@
             document.getElementById('grandTotal').textContent = grandTotal;
         }
 
-        // حفظ التغييرات
+        // حفظ التغييرات والانتقال للصفحة التالية
         function saveChanges() {
             if (selectedItems.length === 0) {
                 showNotification('الرجاء إضافة عناصر أولاً', true);
@@ -206,7 +204,7 @@
             }
             
             localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-            showNotification('تم الحفظ بنجاح', false);
+            window.location.href = 'invoice.html'; // الانتقال للصفحة التالية
         }
 
         // نظام الإشعارات المخصص

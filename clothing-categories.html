@@ -205,6 +205,268 @@
             itemElement.classList.toggle('selected');
         }
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدخال الملابس - مصبنة مشاء الله</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* أنماط متوافقة مع الصفحات السابقة */
+        :root {
+            --primary-bg: #002b4d;
+            --secondary-bg: #003954;
+            --accent-color: #00e676;
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Amiri', serif;
+            background: linear-gradient(135deg, var(--primary-bg), #004c6d);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 30px;
+        }
+
+        /* أزرار الفئات المعدلة */
+        .category-tabs {
+            background: var(--secondary-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            padding: 12px 25px;
+            border: 2px solid var(--accent-color);
+            border-radius: 30px;
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Amiri', serif;
+        }
+
+        .category-btn.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* عناصر الملابس المطورة */
+        .clothing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .clothing-item {
+            background: #005f9955;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .clothing-item.selected {
+            border-color: var(--accent-color);
+            background: #007acc33;
+        }
+
+        .item-image {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #ffffff15;
+            padding: 10px;
+        }
+
+        .item-name {
+            font-size: 18px;
+            margin: 10px 0;
+            color: var(--accent-color);
+        }
+
+        .item-price {
+            font-size: 16px;
+        }
+
+        /* السايدبار المنسجمة */
+        .summary-sidebar {
+            background: var(--secondary-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ffffff20;
+        }
+
+        .total-box {
+            margin-top: 20px;
+            font-size: 20px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .next-btn {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-family: 'Amiri', serif;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .next-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="history.back()">← رجوع</button>
+
+    <div class="container">
+        <div class="category-tabs">
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="رجالية">👔 رجالية</button>
+                <button class="category-btn" data-category="نسائية">👗 نسائية</button>
+                <button class="category-btn" data-category="أطفال">👶 أطفال</button>
+            </div>
+
+            <div class="clothing-grid" id="clothingItems">
+                <!-- العناصر تُضاف بواسطة الجافاسكريبت -->
+            </div>
+        </div>
+
+        <div class="summary-sidebar">
+            <h3>🛍️ العناصر المختارة</h3>
+            <div id="selectedItems"></div>
+            <div class="total-box">
+                المجموع: <span id="totalAmount">0</span> DH
+            </div>
+            <button class="next-btn" onclick="goToCustomization()">التالي ➔</button>
+        </div>
+    </div>
+
+    <script>
+        // بيانات العينات مع صور بديلة
+        const clothingData = {
+            'رجالية': [
+                { 
+                    id: 1, 
+                    name: 'قميص رسمي', 
+                    price: 45, 
+                    image: 'https://cdn-icons-png.flaticon.com/512/13540/13540227.png' 
+                },
+                { 
+                    id: 2, 
+                    name: 'بنطلون جينز', 
+                    price: 60, 
+                    image: 'https://cdn-icons-png.flaticon.com/512/2363/2363763.png' 
+                }
+            ],
+            'نسائية': [
+                { 
+                    id: 3, 
+                    name: 'فستان سهرة', 
+                    price: 80, 
+                    image: 'https://cdn-icons-png.flaticon.com/512/3541/3541569.png' 
+                }
+            ],
+            'أطفال': [
+                { 
+                    id: 4, 
+                    name: 'ملابس أطفال', 
+                    price: 35, 
+                    image: 'https://cdn-icons-png.flaticon.com/512/9752/9752768.png' 
+                }
+            ]
+        };
+
+        let selectedItems = [];
+        let currentCategory = 'رجالية';
+
+        // تفعيل أزرار الفئات
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // إزالة النشاط من جميع الأزرار
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                
+                // إضافة النشاط للزر المختار
+                this.classList.add('active');
+                
+                // تحديث الفئة الحالية
+                currentCategory = this.dataset.category;
+                
+                // إعادة عرض العناصر
+                renderItems();
+            });
+        });
+
+        // عرض العناصر
+        function renderItems() {
+            const container = document.getElementById('clothingItems');
+            const items = clothingData[currentCategory];
+            
+            container.innerHTML = items.map(item => `
+                <div class="clothing-item ${selectedItems.some(i => i.id === item.id) ? 'selected' : ''}" 
+                     data-id="${item.id}" 
+                     onclick="toggleSelection(${item.id})">
+                    <img src="${item.image}" class="item-image" alt="${item.name}" 
+                         onerror="this.src='https://via.placeholder.com/200x150/003954/ffffff?text=صورة+غير+متوفرة'">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">${item.price} DH</div>
+                </div>
+            `).join('');
+        }
+
+        // تبديل الاختيار
+        function toggleSelection(itemId) {
+            const item = clothingData[currentCategory].find(i => i.id === itemId);
+            const index = selectedItems.findIndex(i => i.id === itemId);
+
+            if (index === -1) {
+                selectedItems.push({ ...item, quantity: 1 });
+            } else {
+                selectedItems.splice(index, 1);
+            }
+
+            updateSummary();
+            renderItems(); // لتحديث حالة التحديد
+        }
+
         // تحديث الملخص
         function updateSummary() {
             const container = document.getElementById('selectedItems');
@@ -215,15 +477,14 @@
                 </div>
             `).join('');
 
-            // حساب المجموع
-            const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('totalAmount').textContent = total;
+            document.getElementById('totalAmount').textContent = 
+                selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         }
 
-        // الانتقال لصفحة التخصيص
+        // الانتقال للتخصيص
         function goToCustomization() {
             if (selectedItems.length === 0) {
-                alert('الرجاء اختيار عنصر واحد على الأقل');
+                alert('❗ الرجاء اختيار عنصر واحد على الأقل');
                 return;
             }
             

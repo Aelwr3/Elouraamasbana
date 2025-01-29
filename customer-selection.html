@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة الزبائن - مصبنة مشاء الله</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* أنماط مشتركة مع الصفحة السابقة */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Amiri', serif;
+      background: linear-gradient(135deg, #002b4d, #004c6d);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: auto;
+      position: relative;
+    }
+
+    .container {
+      background: #003954dd;
+      border: 1px solid #005f99;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      animation: slideIn 1s ease-in-out;
+      max-width: 800px;
+      margin: 50px auto;
+    }
+
+    /* أنماط جديدة خاصة بهذه الصفحة */
+    .customer-list {
+      margin: 30px 0;
+      border-top: 2px solid #005f99;
+      padding-top: 20px;
+    }
+
+    .customer-card {
+      background: #005f9955;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.3s;
+    }
+
+    .customer-card:hover {
+      transform: translateX(10px);
+    }
+
+    .actions button {
+      margin: 0 5px;
+      padding: 8px 15px;
+      font-size: 14px;
+      background: linear-gradient(90deg, #007acc, #005f99);
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #ff525255;
+    }
+
+    .success-message {
+      color: #00e676;
+      display: none;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <button class="back-button" onclick="window.location.href='index.html'">← رجوع</button>
+
+  <div class="container">
+    <h1>إدارة قاعدة الزبائن</h1>
+    <p>يمكنك إضافة زبون جديد أو اختيار من القائمة</p>
+
+    <div class="add-section">
+      <input type="text" id="customerName" placeholder="اسم الزبون الجديد">
+      <button onclick="addCustomer()">➕ إضافة زبون</button>
+    </div>
+
+    <div class="customer-list" id="customerList">
+      <!-- سيتم ملؤها بالزبائن من localStorage -->
+    </div>
+
+    <p class="success-message" id="successMessage">✅ تمت العملية بنجاح</p>
+  </div>
+
+  <script>
+    // بيانات الزبائن
+    let customers = JSON.parse(localStorage.getItem('customers')) || [];
+
+    // عرض الزبائن
+    function renderCustomers() {
+      const list = document.getElementById('customerList');
+      list.innerHTML = customers.map((customer, index) => `
+        <div class="customer-card">
+          <span>${customer.name} - #${customer.id}</span>
+          <div class="actions">
+            <button onclick="editCustomer(${index})">✏️ تعديل</button>
+            <button onclick="deleteCustomer(${index})">🗑️ حذف</button>
+            <button onclick="selectCustomer(${index})">✅ اختيار</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // إضافة زبون
+    function addCustomer() {
+      const nameInput = document.getElementById('customerName');
+      if (nameInput.value.trim()) {
+        const newCustomer = {
+          id: Date.now(),
+          name: nameInput.value.trim()
+        };
+        customers.push(newCustomer);
+        localStorage.setItem('customers', JSON.stringify(customers));
+        renderCustomers();
+        showSuccess('تمت إضافة الزبون بنجاح');
+        nameInput.value = '';
+      }
+    }
+
+    // اختيار زبون
+    function selectCustomer(index) {
+      localStorage.setItem('selectedCustomer', JSON.stringify(customers[index]));
+      showSuccess('تم اختيار الزبون');
+      setTimeout(() => {
+        window.location.href = 'clothing-categories.html';
+      }, 1000);
+    }
+
+    // رسائل النجاح
+    function showSuccess(message) {
+      const successEl = document.getElementById('successMessage');
+      successEl.textContent = `✅ ${message}`;
+      successEl.style.display = 'block';
+      setTimeout(() => successEl.style.display = 'none', 2000);
+    }
+
+    // التحميل الأولي
+    renderCustomers();
+  </script>
+</body>
+</html>

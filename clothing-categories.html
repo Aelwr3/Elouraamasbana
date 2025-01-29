@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فئات الملابس - مصبنة مشاء الله</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* الأنماط الأساسية المشتركة */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Amiri', serif;
+      background: linear-gradient(135deg, #002b4d, #004c6d);
+      color: #ffffff;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .container {
+      background: #003954dd;
+      border: 1px solid #005f99;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      max-width: 1000px;
+      margin: 50px auto;
+      animation: slideIn 1s ease-in-out;
+    }
+
+    /* تصميم الفئات */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      margin: 40px 0;
+    }
+
+    .category-card {
+      background: #005f9955;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .category-card:hover {
+      transform: translateY(-5px);
+      border-color: #00e676;
+      box-shadow: 0 8px 25px rgba(0, 230, 118, 0.3);
+    }
+
+    .category-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 15px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+
+    .category-title {
+      font-size: 20px;
+      margin: 10px 0;
+      color: #e0f7fa;
+    }
+
+    /* عربة التسوق العائمة */
+    .cart-floating {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      background: #004a73;
+      padding: 15px 25px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+
+    .cart-icon {
+      width: 35px;
+      height: 35px;
+    }
+
+    .cart-counter {
+      background: #00e676;
+      color: #002b4d;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    /* أنماط الأزرار */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .action-button {
+      background: linear-gradient(90deg, #007acc, #005f99);
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-button" onclick="window.location.href='customer-selection.html'">← رجوع</button>
+
+  <div class="container">
+    <h1>اختر فئة الملابس</h1>
+    <p>اختر الفئة المناسبة لبدء عملية التسجيل</p>
+
+    <div class="categories-grid">
+      <div class="category-card" onclick="showItems('رجالية')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2363/2363763.png" class="category-icon" alt="رجالي">
+        <h3 class="category-title">ملابس رجالية</h3>
+        <p>عدد العناصر: 12</p>
+      </div>
+
+      <div class="category-card" onclick="showItems('نسائية')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1805/1805984.png" class="category-icon" alt="نسائي">
+        <h3 class="category-title">ملابس نسائية</h3>
+        <p>عدد العناصر: 15</p>
+      </div>
+
+      <div class="category-card" onclick="showItems('أطفال')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1805/1805945.png" class="category-icon" alt="أطفال">
+        <h3 class="category-title">ملابس أطفال</h3>
+        <p>عدد العناصر: 10</p>
+      </div>
+
+      <div class="category-card" onclick="showItems('أحذية')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1805/1805817.png" class="category-icon" alt="أحذية">
+        <h3 class="category-title">الأحذية</h3>
+        <p>عدد العناصر: 8</p>
+      </div>
+
+      <div class="category-card" onclick="showItems('الفراش')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1805/1805871.png" class="category-icon" alt="فراش">
+        <h3 class="category-title">أغطية الفراش</h3>
+        <p>عدد العناصر: 6</p>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="action-button" onclick="window.location.href='customer-selection.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/709/709624.png" width="20" alt="رجوع">
+        اختيار زبون آخر
+      </button>
+      <button class="action-button" onclick="goToInvoice()">
+        معاينة الفاتورة
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135692.png" width="20" alt="فاتورة">
+      </button>
+    </div>
+  </div>
+
+  <!-- عربة التسوق العائمة -->
+  <div class="cart-floating" onclick="goToInvoice()">
+    <img src="https://cdn-icons-png.flaticon.com/512/4296/4296683.png" class="cart-icon" alt="عربة">
+    <span class="cart-counter" id="cartCounter">0</span>
+  </div>
+
+  <script>
+    // بيانات العناصر
+    const itemsData = {
+      'رجالية': [
+        { name: 'قميص رسمي', price: 15, icon: '👔' },
+        { name: 'بنطلون جينز', price: 12, icon: '👖' },
+        { name: 'جاكيت جلدي', price: 25, icon: '🧥' }
+      ],
+      'نسائية': [
+        { name: 'فستان سهرة', price: 30, icon: '👗' },
+        { name: 'بلوزة حرير', price: 18, icon: '👚' },
+        { name: 'تنورة', price: 15, icon: '👛' }
+      ],
+      'أطفال': [
+        { name: 'بيجاما أطفال', price: 10, icon: '👶' },
+        { name: 'جوارب', price: 5, icon: '🧦' },
+        { name: 'كنزة', price: 12, icon: '🧥' }
+      ],
+      'أحذية': [
+        { name: 'حذاء رياضي', price: 20, icon: '👟' },
+        { name: 'حذاء رسمي', price: 25, icon: '👞' },
+        { name: 'صندل', price: 15, icon: '👡' }
+      ],
+      'الفراش': [
+        { name: 'غطاء وسادة', price: 8, icon: '🛏️' },
+        { name: 'شرشف سرير', price: 15, icon: '🛌' },
+        { name: 'بطانية', price: 20, icon: '🧶' }
+      ]
+    };
+
+    // تحديث عداد العربة
+    function updateCartCounter() {
+      const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
+      document.getElementById('cartCounter').textContent = items.length;
+    }
+
+    // الانتقال إلى الفاتورة
+    function goToInvoice() {
+      window.location.href = 'invoice.html';
+    }
+
+    // عرض العناصر (سيتم تطويرها في الصفحة التالية)
+    function showItems(category) {
+      localStorage.setItem('currentCategory', category);
+      window.location.href = 'items-selection.html';
+    }
+
+    // تحديث العداد عند التحميل
+    updateCartCounter();
+  </script>
+</body>
+</html>

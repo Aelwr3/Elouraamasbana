@@ -1,311 +1,98 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>اختيار الملابس - مصبنة مشاء الله</title>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    /* أنماط عامة */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Amiri', serif;
-      background: #f5f5f5;
-      color: #333;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-
-    /* تصميم الفئات */
-    .category-section {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-    }
-
-    .category-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .category-icon {
-      width: 60px;
-      height: 60px;
-      margin-left: 15px;
-    }
-
-    /* تصميم العناصر */
-    .items-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .item-card {
-      border: 2px solid #eee;
-      border-radius: 10px;
-      padding: 15px;
-      transition: all 0.3s;
-    }
-
-    .item-card.active {
-      border-color: #007acc;
-      background: #f0f8ff;
-    }
-
-    .item-image {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .quantity-controls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .quantity-btn {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      border: 1px solid #007acc;
-      background: white;
-      color: #007acc;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    /* السايدبار */
-    .summary-sidebar {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      position: fixed;
-      left: 20px;
-      top: 20px;
-      width: 300px;
-    }
-
-    .selected-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 10px 0;
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .total-price {
-      font-size: 24px;
-      color: #007acc;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-
-    .next-btn {
-      background: #007acc;
-      color: white;
-      padding: 12px 30px;
-      border-radius: 25px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- قسم الرجالية -->
-    <div class="category-section">
-      <div class="category-header">
-        <img src="https://cdn-icons-png.flaticon.com/512/13540/13540227.png" class="category-icon" alt="رجالي">
-        <h2>ملابس رجالية</h2>
-      </div>
-      <div class="items-grid" id="mensItems">
-        <!-- العناصر تُضاف بالجافاسكريبت -->
-      </div>
-    </div>
-
-    <!-- أقسام أخرى بنفس النمط -->
-  </div>
-
-  <!-- السايدبار الجانبية -->
-  <div class="summary-sidebar">
-    <h3>🛒 العناصر المختارة</h3>
-    <div id="selectedItems"></div>
-    <div class="total-price">المجموع: <span id="totalAmount">0</span> DH</div>
-    <button class="next-btn" onclick="goToCustomization()">التالي ➔</button>
-  </div>
-
-  <script>
-    // بيانات العينات
-    const itemsData = {
-      mens: [
-        { id: 1, name: 'قميص رسمي', price: 45, image: 'https://example.com/shirt.jpg' },
-        { id: 2, name: 'بنطلون جينز', price: 60, image: 'https://example.com/jeans.jpg' },
-        { id: 3, name: 'جاكيت جلدي', price: 120, image: 'https://example.com/jacket.jpg' }
-      ]
-    };
-
-    let selectedItems = [];
-
-    // إنشاء عناصر القائمة
-    function renderItems() {
-      const container = document.getElementById('mensItems');
-      container.innerHTML = itemsData.mens.map(item => `
-        <div class="item-card" data-id="${item.id}">
-          <img src="${item.image}" class="item-image" alt="${item.name}">
-          <h3>${item.name}</h3>
-          <p>السعر: ${item.price} DH</p>
-          <div class="quantity-controls">
-            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-            <span id="qty-${item.id}">0</span>
-            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // تحديث الكمية
-    function updateQuantity(itemId, change) {
-      const item = itemsData.mens.find(i => i.id === itemId);
-      const index = selectedItems.findIndex(i => i.id === itemId);
-
-      if (index === -1 && change > 0) {
-        selectedItems.push({ ...item, quantity: 1 });
-      } else {
-        selectedItems[index].quantity += change;
-        if (selectedItems[index].quantity < 1) {
-          selectedItems.splice(index, 1);
-        }
-      }
-
-      updateSelectionDisplay();
-    }
-
-    // تحديث العرض
-    function updateSelectionDisplay() {
-      // تحديث السايدبار
-      const selectedContainer = document.getElementById('selectedItems');
-      selectedContainer.innerHTML = selectedItems.map(item => `
-        <div class="selected-item">
-          <div>
-            <b>${item.name}</b><br>
-            <small>${item.quantity} x ${item.price} DH</small>
-          </div>
-          <span>${item.quantity * item.price} DH</span>
-        </div>
-      `).join('');
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختيار الملابس - مصبنة مشاء الله</title>
+    <title>إدخال الملابس - مصبنة مشاء الله</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* أنماط عامة */
+        /* أنماط التصميم */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #007acc;
+            --background: #f8f9fa;
+        }
+
         body {
             margin: 0;
             padding: 20px;
             font-family: 'Amiri', serif;
-            background: #f8f9fa;
+            background: var(--background);
         }
 
         .container {
             max-width: 1200px;
             margin: auto;
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 3fr 1fr;
             gap: 30px;
         }
 
-        /* قسم العناصر */
-        .items-section {
+        /* قسم الفئات */
+        .category-tabs {
             background: white;
-            padding: 25px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 20px;
         }
 
-        .category-title {
-            color: #2c3e50;
-            border-right: 4px solid #007acc;
-            padding-right: 15px;
-            margin-bottom: 25px;
+        .category-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .items-grid {
+        .category-btn {
+            padding: 12px 25px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 30px;
+            background: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .category-btn.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* عناصر الملابس */
+        .clothing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
         }
 
-        .item-card {
-            border: 2px solid #e0e0e0;
+        .clothing-item {
+            border: 2px solid #eee;
             border-radius: 12px;
             padding: 15px;
-            transition: all 0.3s;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .item-card:hover {
-            border-color: #007acc;
-            transform: translateY(-3px);
+        .clothing-item.selected {
+            border-color: var(--secondary-color);
+            background: #e3f2fd;
         }
 
         .item-image {
             width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
         }
 
-        .item-price {
-            color: #27ae60;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .quantity-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 1px solid #007acc;
-            background: none;
-            color: #007acc;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        /* سايدبار الملخص */
+        /* السايدبار */
         .summary-sidebar {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            height: fit-content;
             position: sticky;
             top: 20px;
+            height: fit-content;
         }
 
         .selected-item {
@@ -316,15 +103,15 @@
             border-bottom: 1px solid #eee;
         }
 
-        .total-section {
-            margin-top: 25px;
+        .total-box {
+            margin-top: 20px;
             font-size: 20px;
-            color: #2c3e50;
+            color: var(--primary-color);
             font-weight: bold;
         }
 
         .next-btn {
-            background: #007acc;
+            background: var(--secondary-color);
             color: white;
             padding: 15px 30px;
             border-radius: 30px;
@@ -333,92 +120,89 @@
             width: 100%;
             margin-top: 20px;
             font-size: 18px;
-            transition: 0.3s;
-        }
-
-        .next-btn:hover {
-            background: #005f99;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- قسم العناصر الرئيسي -->
-        <div class="items-section">
-            <h2 class="category-title">ملابس رجالية</h2>
-            <div class="items-grid" id="itemsContainer">
-                <!-- العناصر تُضاف بواسطة الجافاسكريبت -->
+        <!-- القسم الرئيسي -->
+        <div class="category-tabs">
+            <!-- أزرار الفئات -->
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="رجالية">👔 رجالية</button>
+                <button class="category-btn" data-category="نسائية">👗 نسائية</button>
+                <button class="category-btn" data-category="أطفال">👶 أطفال</button>
+            </div>
+
+            <!-- قائمة الملابس -->
+            <div class="clothing-grid" id="clothingItems">
+                <!-- العناصر تُضاف بالجافاسكريبت -->
             </div>
         </div>
 
-        <!-- سايدبار الملخص -->
+        <!-- السايدبار -->
         <div class="summary-sidebar">
-            <h3>العناصر المختارة</h3>
+            <h3>🛍️ العناصر المختارة</h3>
             <div id="selectedItems"></div>
-            <div class="total-section">
-                المجموع: <span id="totalPrice">0</span> DH
+            <div class="total-box">
+                المجموع: <span id="totalAmount">0</span> DH
             </div>
-            <button class="next-btn" onclick="proceedToCustomization()">التالي ➔</button>
+            <button class="next-btn" onclick="goToCustomization()">التالي ➔</button>
         </div>
     </div>
 
     <script>
         // بيانات العينات
-        const items = [
-            {
-                id: 1,
-                name: "قميص رسمي",
-                price: 45,
-                image: "https://via.placeholder.com/250x180/007acc/fff?text=قميص"
-            },
-            {
-                id: 2,
-                name: "بنطلون جينز",
-                price: 60,
-                image: "https://via.placeholder.com/250x180/007acc/fff?text=جينز"
-            },
-            {
-                id: 3,
-                name: "جاكيت جلدي",
-                price: 120,
-                image: "https://via.placeholder.com/250x180/007acc/fff?text=جاكيت"
-            }
-        ];
+        const clothingData = {
+            'رجالية': [
+                { id: 1, name: 'قميص رسمي', price: 45, image: 'https://example.com/shirt.png' },
+                { id: 2, name: 'بنطلون جينز', price: 60, image: 'https://example.com/jeans.png' }
+            ],
+            'نسائية': [
+                { id: 3, name: 'فستان سهرة', price: 80, image: 'https://example.com/dress.png' }
+            ],
+            'أطفال': [
+                { id: 4, name: 'ملابس أطفال', price: 35, image: 'https://example.com/kids.png' }
+            ]
+        };
 
         let selectedItems = [];
+        let currentCategory = 'رجالية';
 
-        // عرض العناصر
+        // عرض العناصر حسب الفئة
         function renderItems() {
-            const container = document.getElementById('itemsContainer');
+            const container = document.getElementById('clothingItems');
+            const items = clothingData[currentCategory];
+            
             container.innerHTML = items.map(item => `
-                <div class="item-card">
+                <div class="clothing-item" data-id="${item.id}">
                     <img src="${item.image}" class="item-image" alt="${item.name}">
-                    <h3>${item.name}</h3>
-                    <p class="item-price">${item.price} DH</p>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                        <span id="qty-${item.id}">0</span>
-                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                    </div>
+                    <h4>${item.name}</h4>
+                    <p>${item.price} DH</p>
+                    <button onclick="toggleSelection(${item.id})">اختيار</button>
                 </div>
             `).join('');
         }
 
-        // تحديث الكمية
-        function updateQuantity(itemId, change) {
-            const item = items.find(i => i.id === itemId);
-            const existing = selectedItems.find(i => i.id === itemId);
+        // تبديل اختيار العنصر
+        function toggleSelection(itemId) {
+            const item = clothingData[currentCategory].find(i => i.id === itemId);
+            const index = selectedItems.findIndex(i => i.id === itemId);
 
-            if (existing) {
-                existing.quantity += change;
-                if (existing.quantity < 1) {
-                    selectedItems = selectedItems.filter(i => i.id !== itemId);
-                }
-            } else if (change > 0) {
+            if (index === -1) {
                 selectedItems.push({ ...item, quantity: 1 });
+            } else {
+                selectedItems.splice(index, 1);
             }
 
             updateSummary();
+            updateItemStyles(itemId);
+        }
+
+        // تحديث المظهر
+        function updateItemStyles(itemId) {
+            const itemElement = document.querySelector(`[data-id="${itemId}"]`);
+            itemElement.classList.toggle('selected');
         }
 
         // تحديث الملخص
@@ -426,27 +210,20 @@
             const container = document.getElementById('selectedItems');
             container.innerHTML = selectedItems.map(item => `
                 <div class="selected-item">
-                    <div>${item.name}</div>
-                    <div>
-                        <span>${item.quantity} x ${item.price} DH</span>
-                    </div>
+                    <span>${item.name}</span>
+                    <span>${item.quantity} x ${item.price} DH</span>
                 </div>
             `).join('');
 
-            // تحديث المجموع
+            // حساب المجموع
             const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('totalPrice').textContent = total;
-
-            // تحديث العدادات
-            selectedItems.forEach(item => {
-                document.getElementById(`qty-${item.id}`).textContent = item.quantity;
-            });
+            document.getElementById('totalAmount').textContent = total;
         }
 
         // الانتقال لصفحة التخصيص
-        function proceedToCustomization() {
+        function goToCustomization() {
             if (selectedItems.length === 0) {
-                alert("الرجاء اختيار عنصر واحد على الأقل");
+                alert('الرجاء اختيار عنصر واحد على الأقل');
                 return;
             }
             

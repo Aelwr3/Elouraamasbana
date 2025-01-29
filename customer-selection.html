@@ -1,124 +1,258 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <!-- ... (بقية الhead كما هي) ... -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة الزبائن - مصبنة مشاء الله</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* إضافة أنماط جديدة للرسائل المخصصة */
+    /* أنماط عامة */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Amiri', serif;
+      background: linear-gradient(135deg, #002b4d, #004c6d);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: auto;
+      position: relative;
+    }
+
+    .container {
+      background: #003954dd;
+      border: 1px solid #005f99;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      animation: slideIn 1s ease-in-out;
+      max-width: 800px;
+      margin: 50px auto;
+    }
+
+    /* تصميم القائمة */
+    .customer-list {
+      margin: 30px 0;
+      border-top: 2px solid #005f99;
+      padding-top: 20px;
+    }
+
+    .customer-card {
+      background: #005f9955;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.3s;
+    }
+
+    .customer-card:hover {
+      transform: translateX(10px);
+    }
+
+    .actions button {
+      margin: 0 5px;
+      padding: 8px 15px;
+      font-size: 14px;
+      background: linear-gradient(90deg, #007acc, #005f99);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #ff525255;
+      padding: 8px 15px;
+      border-radius: 5px;
+    }
+
+    /* أنماط الإدخال */
+    input {
+      font-family: 'Amiri', serif;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 1px solid #005f99;
+      background: #005f9933;
+      color: white;
+      width: 60%;
+    }
+
+    /* أنماط النماذج المخصصة */
     .custom-modal {
+      display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #004d73;
+      background: #004a73;
       padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       z-index: 1000;
-      display: none;
-      max-width: 90%;
+      width: 80%;
+      max-width: 400px;
     }
 
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 999;
-      display: none;
-    }
-
-    .modal-header {
-      font-size: 22px;
-      margin-bottom: 15px;
-      color: #80deea;
+    .modal-content {
+      text-align: center;
     }
 
     .modal-input {
       width: 100%;
       padding: 12px;
       margin: 15px 0;
-      background: #006d9c;
+      background: #005f99;
       border: none;
-      border-radius: 8px;
       color: white;
-      font-size: 16px;
+      border-radius: 8px;
     }
 
     .modal-buttons {
       display: flex;
-      gap: 10px;
       justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
     }
 
-    .modal-button {
-      padding: 10px 25px;
-      border: none;
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+    }
+
+    /* الإشعارات */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #004a73;
+      color: white;
+      padding: 15px 25px;
       border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
+      display: none;
+      animation: slideIn 0.5s ease-out;
     }
 
-    .modal-confirm {
-      background: #00c853;
-    }
-
-    .modal-cancel {
-      background: #ff1744;
+    @keyframes slideIn {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <!-- ... (بقية الbody كما هي) ... -->
-
-  <!-- إضافة عناصر الرسائل المخصصة -->
-  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <!-- عناصر النماذج -->
+  <div class="modal-overlay" id="modalOverlay"></div>
   
   <div class="custom-modal" id="editModal">
-    <div class="modal-header">تعديل اسم الزبون</div>
-    <input type="text" id="editInput" class="modal-input">
-    <div class="modal-buttons">
-      <button class="modal-button modal-confirm" onclick="confirmEdit()">حفظ</button>
-      <button class="modal-button modal-cancel" onclick="closeModals()">إلغاء</button>
+    <div class="modal-content">
+      <h3>تعديل اسم الزبون</h3>
+      <input type="text" id="editNameInput" class="modal-input">
+      <div class="modal-buttons">
+        <button onclick="confirmEdit()">💾 حفظ</button>
+        <button onclick="closeModal()" style="background: #ff5252;">❌ إلغاء</button>
+      </div>
     </div>
   </div>
 
   <div class="custom-modal" id="deleteModal">
-    <div class="modal-header">⚠️ تأكيد الحذف</div>
-    <p>هل أنت متأكد من رغبتك في حذف هذا الزبون؟</p>
-    <div class="modal-buttons">
-      <button class="modal-button modal-confirm" onclick="confirmDelete()">نعم</button>
-      <button class="modal-button modal-cancel" onclick="closeModals()">لا</button>
+    <div class="modal-content">
+      <h3>⚠️ تأكيد الحذف</h3>
+      <p>هل أنت متأكد من رغبتك في حذف هذا الزبون؟</p>
+      <div class="modal-buttons">
+        <button onclick="confirmDelete()">✔️ نعم</button>
+        <button onclick="closeModal()" style="background: #ff5252;">✖️ لا</button>
+      </div>
     </div>
   </div>
 
+  <div class="notification" id="notification"></div>
+
+  <!-- المحتوى الرئيسي -->
+  <button class="back-button" onclick="window.location.href='index.html'">← رجوع</button>
+
+  <div class="container">
+    <h1>إدارة قاعدة الزبائن</h1>
+    <p>يمكنك إضافة زبون جديد أو اختيار من القائمة</p>
+
+    <div class="add-section">
+      <input type="text" id="customerName" placeholder="اسم الزبون الجديد">
+      <button onclick="addCustomer()">➕ إضافة زبون</button>
+    </div>
+
+    <div class="customer-list" id="customerList"></div>
+  </div>
+
   <script>
-    // متغيرات عامة
+    let customers = JSON.parse(localStorage.getItem('customers')) || [];
     let currentEditIndex = null;
 
-    // عرض نافذة التعديل
+    // عرض الزبائن
+    function renderCustomers() {
+      const list = document.getElementById('customerList');
+      list.innerHTML = customers.map((customer, index) => `
+        <div class="customer-card">
+          <span>${customer.name} - #${customer.id}</span>
+          <div class="actions">
+            <button onclick="editCustomer(${index})">✏️ تعديل</button>
+            <button onclick="deleteCustomer(${index})">🗑️ حذف</button>
+            <button onclick="selectCustomer(${index})">✅ اختيار</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // إضافة زبون
+    function addCustomer() {
+      const nameInput = document.getElementById('customerName');
+      if (nameInput.value.trim()) {
+        const newCustomer = {
+          id: Date.now(),
+          name: nameInput.value.trim()
+        };
+        customers.push(newCustomer);
+        localStorage.setItem('customers', JSON.stringify(customers));
+        renderCustomers();
+        showNotification('تمت إضافة الزبون بنجاح');
+        nameInput.value = '';
+      }
+    }
+
+    // فتح نموذج التعديل
     function editCustomer(index) {
       currentEditIndex = index;
-      document.getElementById('editInput').value = customers[index].name;
-      showModal('editModal');
+      document.getElementById('editNameInput').value = customers[index].name;
+      openModal('editModal');
     }
 
     // تأكيد التعديل
     function confirmEdit() {
-      if (document.getElementById('editInput').value.trim()) {
-        customers[currentEditIndex].name = document.getElementById('editInput').value.trim();
+      const newName = document.getElementById('editNameInput').value.trim();
+      if (newName) {
+        customers[currentEditIndex].name = newName;
         localStorage.setItem('customers', JSON.stringify(customers));
         renderCustomers();
-        showSuccess('تم التعديل بنجاح');
-        closeModals();
+        showNotification('تم التعديل بنجاح');
+        closeModal();
+      } else {
+        showNotification('يرجى إدخال اسم صحيح', true);
       }
     }
 
-    // عرض نافذة الحذف
+    // فتح نموذج الحذف
     function deleteCustomer(index) {
       currentEditIndex = index;
-      showModal('deleteModal');
+      openModal('deleteModal');
     }
 
     // تأكيد الحذف
@@ -126,26 +260,41 @@
       customers.splice(currentEditIndex, 1);
       localStorage.setItem('customers', JSON.stringify(customers));
       renderCustomers();
-      showSuccess('تم الحذف بنجاح');
-      closeModals();
+      showNotification('تم الحذف بنجاح');
+      closeModal();
     }
 
-    // إدارة النوافذ
-    function showModal(modalId) {
-      document.getElementById('modalBackdrop').style.display = 'block';
+    // اختيار الزبون
+    function selectCustomer(index) {
+      localStorage.setItem('selectedCustomer', JSON.stringify(customers[index]));
+      showNotification('جاري التوجيه...');
+      setTimeout(() => window.location.href = 'clothing-categories.html', 1000);
+    }
+
+    // إدارة النماذج
+    function openModal(modalId) {
+      document.getElementById('modalOverlay').style.display = 'block';
       document.getElementById(modalId).style.display = 'block';
     }
 
-    function closeModals() {
+    function closeModal() {
+      document.getElementById('modalOverlay').style.display = 'none';
       document.querySelectorAll('.custom-modal').forEach(modal => {
         modal.style.display = 'none';
       });
-      document.getElementById('modalBackdrop').style.display = 'none';
-      currentEditIndex = null;
     }
 
-    // إغلاق النوافذ بالنقر خارجها
-    document.getElementById('modalBackdrop').addEventListener('click', closeModals);
+    // عرض الإشعارات
+    function showNotification(message, isError = false) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.backgroundColor = isError ? '#ff5252' : '#004a73';
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 3000);
+    }
+
+    // التحميل الأولي
+    renderCustomers();
   </script>
 </body>
 </html>

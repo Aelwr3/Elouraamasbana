@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة - مصبنة مشاء الله</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #002b4d;
+            --secondary-color: #00e676;
+            --text-color: #333;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: 'Amiri', serif;
+            background: #f5f5f5;
+            color: var(--text-color);
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 150px;
+        }
+
+        .invoice-info {
+            text-align: left;
+        }
+
+        .invoice-details {
+            margin-bottom: 30px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        .items-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .total-section {
+            text-align: left;
+            margin-top: 30px;
+            font-size: 20px;
+        }
+
+        .actions {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .print-btn {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        @media print {
+            .actions, .back-button {
+                display: none !important;
+            }
+            
+            .invoice-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #ff5252;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <a class="back-button" href="customization.html">← الرجوع</a>
+
+    <div class="invoice-container">
+        <!-- رأس الفاتورة -->
+        <div class="header-section">
+            <div class="invoice-info">
+                <h2>مصبنة مشاء الله</h2>
+                <p>تاريخ الفاتورة: <span id="invoiceDate"></span></p>
+                <p>رقم الفاتورة: <span id="invoiceNumber"></span></p>
+            </div>
+            <img src="https://via.placeholder.com/150x60/002b4d/ffffff?text=مصبنة+مشاء+الله" class="logo" alt="الشعار">
+        </div>
+
+        <!-- تفاصيل الفاتورة -->
+        <div class="invoice-details">
+            <h3>الزبون: <span id="customerName">عميل جديد</span></h3>
+        </div>
+
+        <!-- جدول العناصر -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>اسم العنصر</th>
+                    <th>السعر</th>
+                    <th>الكمية</th>
+                    <th>المجموع</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceItems"></tbody>
+        </table>
+
+        <!-- المجموع الكلي -->
+        <div class="total-section">
+            <p>المجموع الكلي: <span id="totalAmount">0</span> درهم</p>
+        </div>
+
+        <!-- أزرار التحكم -->
+        <div class="actions">
+            <button class="print-btn" onclick="window.print()">🖨️ طباعة الفاتورة</button>
+        </div>
+    </div>
+
+    <script>
+        // توليد بيانات الفاتورة
+        function generateInvoice() {
+            // استرجاع البيانات من localStorage
+            const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
+            const customer = JSON.parse(localStorage.getItem('selectedCustomer')) || { name: 'عميل جديد' };
+
+            // تعبئة البيانات
+            document.getElementById('customerName').textContent = customer.name;
+            document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('invoiceNumber').textContent = '#' + Date.now().toString().slice(-6);
+
+            // تعبئة العناصر
+            const itemsContainer = document.getElementById('invoiceItems');
+            itemsContainer.innerHTML = items.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.price} DH</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price * item.quantity} DH</td>
+                </tr>
+            `).join('');
+
+            // حساب المجموع الكلي
+            const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalAmount').textContent = total;
+        }
+
+        // التحميل الأولي
+        generateInvoice();
+    </script>
+</body>
+  </html>

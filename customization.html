@@ -8,10 +8,9 @@
     <style>
         :root {
             --primary-bg: #002b4d;
-            --secondary-bg: #003954dd;
+            --secondary-bg: #003954;
             --accent-color: #00e676;
             --text-color: #ffffff;
-            --warning-color: #ff5252;
         }
 
         body {
@@ -26,7 +25,6 @@
         .container {
             max-width: 1200px;
             margin: auto;
-            padding: 20px;
         }
 
         .customization-table {
@@ -37,7 +35,6 @@
             overflow: hidden;
             box-shadow: 0 8px 30px rgba(0,0,0,0.6);
             margin-bottom: 30px;
-            backdrop-filter: blur(5px);
         }
 
         .customization-table th,
@@ -45,53 +42,37 @@
             padding: 15px;
             text-align: center;
             border-bottom: 1px solid #ffffff20;
-            transition: all 0.3s;
-        }
-
-        .customization-table tr:hover td {
-            background: #ffffff08;
         }
 
         .customization-table th {
             background: var(--accent-color);
             color: var(--primary-bg);
-            font-size: 18px;
         }
 
         .customization-table input {
-            width: 100px;
-            padding: 10px;
+            width: 80px;
+            padding: 8px;
             border-radius: 8px;
-            border: 2px solid #ffffff30;
-            background: #ffffff10;
+            border: 1px solid #ffffff50;
+            background: #ffffff15;
             color: var(--text-color);
             text-align: center;
-            transition: all 0.3s;
-        }
-
-        .customization-table input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(0, 230, 118, 0.2);
         }
 
         .controls {
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 30px;
         }
 
         .action-btn {
-            padding: 15px 40px;
+            padding: 12px 30px;
             border-radius: 30px;
             border: none;
             cursor: pointer;
             font-family: 'Amiri', serif;
             font-weight: bold;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            transition: 0.3s;
         }
 
         .save-btn {
@@ -99,105 +80,59 @@
             color: var(--primary-bg);
         }
 
-        .save-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 230, 118, 0.3);
-        }
-
         .delete-btn {
-            background: var(--warning-color);
+            background: #ff5252;
             color: white;
-        }
-
-        .delete-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(255, 82, 82, 0.3);
         }
 
         .total-box {
             text-align: center;
-            font-size: 28px;
-            margin: 30px 0;
-            padding: 20px;
-            background: var(--secondary-bg);
-            border-radius: 15px;
-            border: 2px solid var(--accent-color);
+            font-size: 24px;
+            margin: 25px 0;
+            color: var(--accent-color);
         }
 
-        .floating-controls {
+        .back-button {
             position: fixed;
-            bottom: 30px;
-            left: 30px;
-            display: flex;
-            gap: 15px;
-            z-index: 1000;
-        }
-
-        .control-btn {
+            bottom: 20px;
+            left: 20px;
+            background: #ff525255;
             padding: 12px 25px;
             border-radius: 30px;
-            border: none;
             cursor: pointer;
-            font-family: 'Amiri', serif;
-            background: var(--accent-color);
-            color: var(--primary-bg);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            z-index: 1000;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
         }
 
-        .control-btn.exit {
-            background: var(--warning-color);
-            color: white;
-        }
-
-        .control-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .custom-notification {
+        .notification {
             position: fixed;
-            top: 30px;
-            right: 30px;
-            padding: 15px 30px;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
             border-radius: 30px;
             z-index: 1000;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease-out;
         }
 
         @keyframes slideIn {
-            0% { transform: translateX(100%); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .customization-table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .action-btn {
-                padding: 12px 25px;
-                font-size: 14px;
-            }
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 style="text-align: center; margin-bottom: 30px; color: var(--accent-color);">
-            🧺 تخصيص العناصر المختارة
-        </h1>
+        <h1>تخصيص العناصر المختارة</h1>
         
         <table class="customization-table">
             <thead>
                 <tr>
                     <th>اسم العنصر</th>
-                    <th>السعر (DH)</th>
+                    <th>السعر للقطعة (DH)</th>
                     <th>الكمية</th>
                     <th>المجموع</th>
                     <th>الإجراءات</th>
@@ -207,58 +142,31 @@
         </table>
 
         <div class="total-box">
-            🧮 المجموع الكلي: <span id="grandTotal">0</span> DH
+            المجموع الكلي: <span id="grandTotal">0</span> DH
         </div>
 
         <div class="controls">
-            <button class="action-btn save-btn" onclick="saveChanges()">
-                💾 حفظ التغييرات
-            </button>
+            <button class="action-btn save-btn" onclick="saveChanges()">💾 حفظ التغييرات</button>
         </div>
     </div>
 
-    <div class="floating-controls">
-        <button class="control-btn" onclick="window.location.href='customer-selection.html'">
-            🏠 الرئيسية
-        </button>
-        <button class="control-btn exit" onclick="window.location.href='index.html'">
-            🔒 إغلاق النظام
-        </button>
-    </div>
+    <button class="back-button" onclick="window.history.back()">← الرجوع</button>
 
     <script>
+        // تحميل البيانات من localStorage
         let selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
 
+        // عرض الجدول
         function renderTable() {
             const tableBody = document.getElementById('itemsTable');
             tableBody.innerHTML = selectedItems.map((item, index) => `
                 <tr>
+                    <td><input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)"></td>
+                    <td><input type="number" value="${item.price}" min="1" oninput="updateItem(${index}, 'price', this.value)"></td>
+                    <td><input type="number" value="${item.quantity}" min="1" oninput="updateItem(${index}, 'quantity', this.value)"></td>
+                    <td>${item.price * item.quantity} DH</td>
                     <td>
-                        <input type="text" 
-                               value="${item.name}" 
-                               oninput="updateItem(${index}, 'name', this.value)"
-                               style="min-width: 150px;">
-                    </td>
-                    <td>
-                        <input type="number" 
-                               value="${item.price}" 
-                               min="1" 
-                               step="5"
-                               oninput="updateItem(${index}, 'price', this.value)">
-                    </td>
-                    <td>
-                        <input type="number" 
-                               value="${item.quantity}" 
-                               min="1" 
-                               oninput="updateItem(${index}, 'quantity', this.value)">
-                    </td>
-                    <td style="font-weight: bold; color: var(--accent-color);">
-                        ${(item.price * item.quantity).toFixed(2)} DH
-                    </td>
-                    <td>
-                        <button class="action-btn delete-btn" onclick="deleteItem(${index})">
-                            🗑️ حذف
-                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteItem(${index})">🗑️ حذف</button>
                     </td>
                 </tr>
             `).join('');
@@ -266,52 +174,55 @@
             updateGrandTotal();
         }
 
+        // تحديث العنصر
         function updateItem(index, field, value) {
             if (field === 'price' || field === 'quantity') {
                 value = Math.max(1, Number(value));
-                if (field === 'price') value = Math.round(value / 5) * 5; // تقريب لـ 5 دراهم
             }
             selectedItems[index][field] = value;
             renderTable();
         }
 
+        // حذف العنصر
         function deleteItem(index) {
-            selectedItems.splice(index, 1);
-            showNotification('تم حذف العنصر بنجاح', false);
-            renderTable();
+            if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+                selectedItems.splice(index, 1);
+                showNotification('تم الحذف بنجاح');
+                renderTable();
+            }
         }
 
+        // تحديث المجموع الكلي
         function updateGrandTotal() {
             const grandTotal = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+            document.getElementById('grandTotal').textContent = grandTotal;
         }
 
+        // حفظ التغييرات
         function saveChanges() {
             if (selectedItems.length === 0) {
-                showNotification('❗ الرجاء إضافة عناصر أولاً', true);
+                showNotification('الرجاء إضافة عناصر أولاً', true);
                 return;
             }
             
             localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-            showNotification('تم الحفظ بنجاح جاري التوجيه...', false);
-            setTimeout(() => {
-                window.location.href = 'invoice.html';
-            }, 1500);
+            showNotification('تم الحفظ بنجاح، جاري التوجيه...');
+            setTimeout(() => window.location.href = 'invoice.html', 1500);
         }
 
-        function showNotification(message, isError) {
+        // عرض الإشعارات
+        function showNotification(message, isError = false) {
             const notification = document.createElement('div');
-            notification.className = 'custom-notification';
+            notification.className = 'notification';
             notification.textContent = message;
-            notification.style.background = isError ? var(--warning-color) : var(--accent-color);
-            notification.style.color = isError ? 'white' : var(--primary-bg);
+            notification.style.background = isError ? '#ff5252' : '#00e676';
+            notification.style.color = isError ? 'white' : '#002b4d';
 
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 300);
-            }, 2500);
+                notification.remove();
+            }, 3000);
         }
 
         // التحميل الأولي

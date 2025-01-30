@@ -6,6 +6,7 @@
     <title>فاتورة - مصبنة مشاء الله</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* الأنماط تبقى كما هي بدون تغيير */
         :root {
             --primary-color: #002b4d;
             --secondary-color: #00e676;
@@ -236,23 +237,20 @@
     <div class="custom-alert" id="customAlert"></div>
 
     <script>
-        // إدارة أرقام الفواتير
-        let lastInvoiceNumber = parseInt(localStorage.getItem('lastInvoiceNumber')) || 1000;
-        let currentInvoiceNumber = lastInvoiceNumber + 1;
-        localStorage.setItem('lastInvoiceNumber', currentInvoiceNumber);
+        // توليد رقم فاتورة فريد
+        const generateInvoiceId = () => 'INV-' + Date.now().toString().slice(-6);
 
         // إدارة المؤقتات
         let warningTimer;
-        let redirectTimer;
         let countdown = 10;
 
         // توليد الفاتورة
         function generateInvoice() {
-            const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
             const customer = JSON.parse(localStorage.getItem('selectedCustomer')) || { name: 'عميل جديد' };
+            const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
 
-            document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString();
-            document.getElementById('invoiceNumber').textContent = `INV-${currentInvoiceNumber}`;
+            document.getElementById('invoiceNumber').textContent = generateInvoiceId();
+            document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString('ar-EG');
             document.getElementById('customerName').textContent = customer.name;
 
             const itemsContainer = document.getElementById('invoiceItems');
@@ -269,6 +267,35 @@
             document.getElementById('totalAmount').textContent = total;
         }
 
+        // حفظ الفاتورة
+        function saveInvoice() {
+            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+            const customer = JSON.parse(localStorage.getItem('selectedCustomer')) || { name: 'عميل جديد' };
+            const items = JSON.parse(localStorage.getItem('selectedItems')) || [];
+            
+            if (items.length === 0) {
+                showCustomAlert('❗ الرجاء إضافة عناصر أولاً', true);
+                return;
+            }
+
+            const newInvoice = {
+                id: generateInvoiceId(),
+                customer: customer,
+                items: items,
+                total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                date: new Date().toLocaleDateString('ar-EG'),
+                status: 'unpaid',
+                paidAmount: 0
+            };
+
+            invoices.push(newInvoice);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            localStorage.setItem('currentInvoice', JSON.stringify(newInvoice));
+            
+            showCustomAlert('تم حفظ الفاتورة رقم ' + newInvoice.id);
+            setTimeout(() => window.location.href = 'payment.html', 2000);
+        }
+
         // عرض تحذير الانتقال
         function showPaymentWarning() {
             const overlay = document.getElementById('warningOverlay');
@@ -283,7 +310,6 @@
         // الانتقال لصفحة الدفع
         function proceedToPayment() {
             clearInterval(warningTimer);
-            localStorage.removeItem('selectedItems');
             window.location.href = 'payment.html';
         }
 
@@ -298,24 +324,11 @@
             window.history.back();
         }
 
-        // حفظ الفاتورة
-        function saveInvoice() {
-            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
-            invoices.push({
-                number: currentInvoiceNumber,
-                items: JSON.parse(localStorage.getItem('selectedItems')),
-                total: document.getElementById('totalAmount').textContent,
-                date: new Date().toISOString()
-            });
-            
-            localStorage.setItem('invoices', JSON.stringify(invoices));
-            showCustomAlert('تم حفظ الفاتورة رقم ' + currentInvoiceNumber);
-        }
-
-        // عرض الإشعار المخصص
-        function showCustomAlert(message) {
+        // عرض الإشعارات
+        function showCustomAlert(message, isError = false) {
             const alertBox = document.getElementById('customAlert');
             alertBox.textContent = message;
+            alertBox.style.backgroundColor = isError ? '#ff5252' : '#00e676';
             alertBox.style.display = 'block';
             
             setTimeout(() => {
@@ -324,10 +337,7 @@
         }
 
         // بدء التشغيل
-        window.addEventListener('load', () => {
-            generateInvoice();
-            setTimeout(showPaymentWarning, 5000);
-        });
+        window.addEventListener('load', generateInvoice);
     </script>
 </body>
 </html>

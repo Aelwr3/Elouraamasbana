@@ -6,6 +6,7 @@
     <title>إدارة الدفع - مصبنة مشاء الله</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* الأنماط نفسها التي في customer-selection.html */
         body {
             margin: 0;
             padding: 20px;
@@ -15,17 +16,17 @@
             position: relative;
         }
 
-        .payment-container {
-            max-width: 600px;
-            margin: 0 auto;
+        .container {
             background: #003954dd;
             border: 2px solid #005f99;
             border-radius: 15px;
             padding: 25px;
+            margin: 20px auto;
+            max-width: 600px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.6);
         }
 
-        .payment-header {
+        .invoice-header {
             text-align: center;
             border-bottom: 2px solid #005f99;
             padding-bottom: 15px;
@@ -52,10 +53,6 @@
             cursor: pointer;
             font-size: 18px;
             transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
         .paid { background: #00e676; color: #002b4d; }
@@ -73,79 +70,69 @@
             border: none;
             color: white;
         }
-
-        .total-amount {
-            font-size: 24px;
-            text-align: center;
-            margin: 20px 0;
-            color: #00e676;
-        }
     </style>
 </head>
 <body>
-    <div class="payment-container">
-        <div class="payment-header">
-            <h1>إتمام عملية الدفع</h1>
+    <div class="container">
+        <div class="invoice-header">
+            <h1>فاتورة الدفع</h1>
             <p>رقم الفاتورة: <span id="invoiceId"></span></p>
+            <p>التاريخ: <span id="invoiceDate"></span></p>
         </div>
 
-        <div class="payment-details">
+        <div>
             <h3>الزبون: <span id="customerName"></span></h3>
-            <div id="paymentItems"></div>
-            <div class="total-amount">المجموع: <span id="totalAmount">0</span> درهم</div>
+            <div id="itemsList"></div>
+            <h2 style="color: #00e676; text-align: center;">
+                المجموع: <span id="totalAmount">0</span> درهم
+            </h2>
         </div>
 
         <div class="payment-options">
-            <button class="payment-btn paid" onclick="handlePayment('paid')">
-                ✅ دفع كامل
-            </button>
-            <button class="payment-btn partial" onclick="handlePayment('partial')">
-                💰 دفع جزئي
-            </button>
-            <button class="payment-btn unpaid" onclick="handlePayment('unpaid')">
-                ❌ لم يتم الدفع
-            </button>
+            <button class="payment-btn paid" onclick="handlePayment('paid')">✅ دفع كامل</button>
+            <button class="payment-btn partial" onclick="handlePayment('partial')">💰 دفع جزئي</button>
+            <button class="payment-btn unpaid" onclick="handlePayment('unpaid')">❌ تأجيل الدفع</button>
         </div>
     </div>
 
     <button class="back-btn" onclick="window.history.back()">← الرجوع</button>
 
     <script>
-        // جلب بيانات الفاتورة الحالية
+        // جلب البيانات من الصفحات السابقة
         const currentInvoice = JSON.parse(localStorage.getItem('currentInvoice')) || {};
-        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        const allInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
 
-        // تعبئة البيانات
-        document.getElementById('invoiceId').textContent = currentInvoice.id;
+        // تعبئة البيانات التلقائية
+        document.getElementById('invoiceId').textContent = currentInvoice.id || '---';
+        document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString('ar-EG');
         document.getElementById('customerName').textContent = currentInvoice.customer?.name || 'عميل غير معروف';
-        document.getElementById('totalAmount').textContent = currentInvoice.total;
+        document.getElementById('totalAmount').textContent = currentInvoice.total || 0;
 
-        const itemsContainer = document.getElementById('paymentItems');
-        itemsContainer.innerHTML = currentInvoice.items?.map(item => `
+        // عرض العناصر المختارة
+        const itemsList = document.getElementById('itemsList');
+        itemsList.innerHTML = (currentInvoice.items || []).map(item => `
             <div class="invoice-item">
                 <span>${item.name}</span>
-                <span>${item.price} درهم × ${item.quantity}</span>
+                <span>${item.price} × ${item.quantity}</span>
                 <span>${item.price * item.quantity} درهم</span>
             </div>
-        `).join('') || '';
+        `).join('');
 
         function handlePayment(status) {
             let paidAmount = 0;
             
-            if(status === 'partial') {
+            if (status === 'partial') {
                 const amount = prompt('المبلغ المدفوع (درهم):');
                 paidAmount = parseFloat(amount) || 0;
-                if(isNaN(paidAmount) || paidAmount <= 0) {
-                    alert('المبلغ غير صحيح!');
+                if (isNaN(paidAmount) || paidAmount <= 0) {
+                    alert('❗ الرجاء إدخال مبلغ صحيح');
                     return;
                 }
-            }
-            
-            if(status === 'paid') {
+            } else if (status === 'paid') {
                 paidAmount = currentInvoice.total;
             }
 
-            // تحديث حالة الفاتورة
+            // تحديث بيانات الفاتورة
             const updatedInvoice = {
                 ...currentInvoice,
                 status: status,
@@ -154,7 +141,7 @@
             };
 
             // تحديث localStorage
-            const updatedInvoices = invoices.map(inv => 
+            const updatedInvoices = allInvoices.map(inv => 
                 inv.id === currentInvoice.id ? updatedInvoice : inv
             );
             

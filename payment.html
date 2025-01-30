@@ -32,23 +32,26 @@
             margin-bottom: 20px;
         }
 
-        .payment-details {
-            margin: 20px 0;
+        .invoice-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #005f9955;
         }
 
-        .payment-status {
+        .payment-options {
             display: grid;
             gap: 15px;
             margin-top: 30px;
         }
 
-        .status-btn {
+        .payment-btn {
             padding: 15px;
             border-radius: 10px;
             border: none;
             cursor: pointer;
             font-size: 18px;
-            transition: transform 0.3s;
+            transition: 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -71,11 +74,11 @@
             color: white;
         }
 
-        .invoice-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #005f9955;
+        .total-amount {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            color: #00e676;
         }
     </style>
 </head>
@@ -89,17 +92,17 @@
         <div class="payment-details">
             <h3>الزبون: <span id="customerName"></span></h3>
             <div id="paymentItems"></div>
-            <h2 class="total-amount">المجموع: <span id="totalAmount">0</span> درهم</h2>
+            <div class="total-amount">المجموع: <span id="totalAmount">0</span> درهم</div>
         </div>
 
-        <div class="payment-status">
-            <button class="status-btn paid" onclick="handlePayment('paid')">
+        <div class="payment-options">
+            <button class="payment-btn paid" onclick="handlePayment('paid')">
                 ✅ دفع كامل
             </button>
-            <button class="status-btn partial" onclick="handlePayment('partial')">
+            <button class="payment-btn partial" onclick="handlePayment('partial')">
                 💰 دفع جزئي
             </button>
-            <button class="status-btn unpaid" onclick="handlePayment('unpaid')">
+            <button class="payment-btn unpaid" onclick="handlePayment('unpaid')">
                 ❌ لم يتم الدفع
             </button>
         </div>
@@ -108,11 +111,11 @@
     <button class="back-btn" onclick="window.history.back()">← الرجوع</button>
 
     <script>
-        // جلب بيانات الفاتورة من localStorage
+        // جلب بيانات الفاتورة الحالية
         const currentInvoice = JSON.parse(localStorage.getItem('currentInvoice')) || {};
         const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
 
-        // عرض بيانات الفاتورة
+        // تعبئة البيانات
         document.getElementById('invoiceId').textContent = currentInvoice.id;
         document.getElementById('customerName').textContent = currentInvoice.customer?.name || 'عميل غير معروف';
         document.getElementById('totalAmount').textContent = currentInvoice.total;
@@ -121,42 +124,43 @@
         itemsContainer.innerHTML = currentInvoice.items?.map(item => `
             <div class="invoice-item">
                 <span>${item.name}</span>
-                <span>${item.price} درهم</span>
+                <span>${item.price} درهم × ${item.quantity}</span>
+                <span>${item.price * item.quantity} درهم</span>
             </div>
         `).join('') || '';
 
-        // معالجة حالة الدفع
         function handlePayment(status) {
-            let paymentData = {
-                status: status,
-                paidAmount: 0,
-                paymentDate: new Date().toLocaleDateString('ar-EG')
-            };
-
-            switch(status) {
-                case 'paid':
-                    paymentData.paidAmount = currentInvoice.total;
-                    break;
-                case 'partial':
-                    const amount = prompt('المبلغ المدفوع (درهم):');
-                    paymentData.paidAmount = parseFloat(amount) || 0;
-                    break;
+            let paidAmount = 0;
+            
+            if(status === 'partial') {
+                const amount = prompt('المبلغ المدفوع (درهم):');
+                paidAmount = parseFloat(amount) || 0;
+                if(isNaN(paidAmount) || paidAmount <= 0) {
+                    alert('المبلغ غير صحيح!');
+                    return;
+                }
+            }
+            
+            if(status === 'paid') {
+                paidAmount = currentInvoice.total;
             }
 
-            // تحديث الفاتورة
+            // تحديث حالة الفاتورة
             const updatedInvoice = {
                 ...currentInvoice,
-                ...paymentData
+                status: status,
+                paidAmount: paidAmount,
+                paymentDate: new Date().toLocaleDateString('ar-EG')
             };
 
             // تحديث localStorage
             const updatedInvoices = invoices.map(inv => 
                 inv.id === currentInvoice.id ? updatedInvoice : inv
             );
+            
             localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
             localStorage.setItem('currentInvoice', JSON.stringify(updatedInvoice));
-
-            // التوجيه لصفحة السجل
+            
             window.location.href = 'history.html';
         }
     </script>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل الفواتير - مصبنة مشاء الله</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #002b4d, #004c6d);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            background: #003954dd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #005f99;
+            border-radius: 8px;
+            background: #005f9933;
+            color: white;
+            font-size: 16px;
+        }
+
+        .invoice-card {
+            background: #003954dd;
+            border: 2px solid #005f99;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .paid { background: #00e67633; color: #00e676; }
+        .unpaid { background: #ff525233; color: #ff5252; }
+        .partial { background: #ffc10733; color: #ffc107; }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #ff525255;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" 
+                   placeholder="ابحث برقم الفاتورة أو اسم الزبون..."
+                   onkeyup="searchInvoices(this.value)">
+        </div>
+
+        <div id="invoicesList"></div>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">← الرئيسية</button>
+
+    <script>
+        let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
+        function renderInvoices(filteredInvoices = invoices) {
+            const container = document.getElementById('invoicesList');
+            container.innerHTML = filteredInvoices.map(invoice => `
+                <div class="invoice-card">
+                    <div class="invoice-header">
+                        <div>
+                            <h3>فاتورة #${invoice.id}</h3>
+                            <p>${invoice.customer?.name || 'عميل غير معروف'}</p>
+                        </div>
+                        <span class="status ${invoice.status}">
+                            ${getStatusText(invoice.status)}
+                            ${invoice.status === 'partial' ? `(${invoice.paidAmount} درهم)` : ''}
+                        </span>
+                    </div>
+                    <div>
+                        <p>التاريخ: ${invoice.paymentDate || invoice.date}</p>
+                        <p>المجموع: ${invoice.total} درهم</p>
+                        ${invoice.status !== 'unpaid' ? `<p>المدفوع: ${invoice.paidAmount} درهم</p>` : ''}
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+
+        function searchInvoices(value) {
+            const searchTerm = value.toLowerCase();
+            const filtered = invoices.filter(invoice => 
+                invoice.id.toLowerCase().includes(searchTerm) ||
+                invoice.customer?.name?.toLowerCase().includes(searchTerm)
+            );
+            renderInvoices(filtered);
+        }
+
+        function getStatusText(status) {
+            return {
+                'paid': 'مدفوع',
+                'unpaid': 'غير مدفوع',
+                'partial': 'مدفوع جزئيًا'
+            }[status] || status;
+        }
+
+        // التحميل الأولي
+        renderInvoices();
+    </script>
+</body>
+</html>

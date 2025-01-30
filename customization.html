@@ -116,6 +116,8 @@
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             animation: slideIn 0.5s ease-out;
+            background: var(--accent-color);
+            color: var(--primary-bg);
         }
 
         @keyframes slideIn {
@@ -185,11 +187,9 @@
 
         // حذف العنصر
         function deleteItem(index) {
-            if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
-                selectedItems.splice(index, 1);
-                showNotification('تم الحذف بنجاح');
-                renderTable();
-            }
+            selectedItems.splice(index, 1);
+            showNotification('تم الحذف بنجاح');
+            renderTable();
         }
 
         // تحديث المجموع الكلي
@@ -206,7 +206,7 @@
             }
             
             localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-            showNotification('تم الحفظ بنجاح، جاري التوجيه...');
+            showNotification('تم الحفظ بنجاح');
             setTimeout(() => window.location.href = 'invoice.html', 1500);
         }
 
@@ -215,8 +215,8 @@
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.textContent = message;
-            notification.style.background = isError ? '#ff5252' : '#00e676';
-            notification.style.color = isError ? 'white' : '#002b4d';
+            notification.style.background = isError ? '#ff5252' : var(--accent-color);
+            notification.style.color = isError ? 'white' : var(--primary-bg);
 
             document.body.appendChild(notification);
             

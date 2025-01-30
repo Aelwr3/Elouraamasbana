@@ -6,7 +6,6 @@
     <title>إدارة الدفع - مصبنة مشاء الله</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* الأنماط نفسها التي في customer-selection.html */
         body {
             margin: 0;
             padding: 20px;
@@ -75,7 +74,7 @@
 <body>
     <div class="container">
         <div class="invoice-header">
-            <h1>فاتورة الدفع</h1>
+            <h1>إتمام عملية الدفع</h1>
             <p>رقم الفاتورة: <span id="invoiceId"></span></p>
             <p>التاريخ: <span id="invoiceDate"></span></p>
         </div>
@@ -98,58 +97,66 @@
     <button class="back-btn" onclick="window.history.back()">← الرجوع</button>
 
     <script>
-        // جلب البيانات من الصفحات السابقة
-        const currentInvoice = JSON.parse(localStorage.getItem('currentInvoice')) || {};
-        const allInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
-
-        // تعبئة البيانات التلقائية
-        document.getElementById('invoiceId').textContent = currentInvoice.id || '---';
-        document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString('ar-EG');
-        document.getElementById('customerName').textContent = currentInvoice.customer?.name || 'عميل غير معروف';
-        document.getElementById('totalAmount').textContent = currentInvoice.total || 0;
-
-        // عرض العناصر المختارة
-        const itemsList = document.getElementById('itemsList');
-        itemsList.innerHTML = (currentInvoice.items || []).map(item => `
-            <div class="invoice-item">
-                <span>${item.name}</span>
-                <span>${item.price} × ${item.quantity}</span>
-                <span>${item.price * item.quantity} درهم</span>
-            </div>
-        `).join('');
-
-        function handlePayment(status) {
-            let paidAmount = 0;
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentInvoice = JSON.parse(localStorage.getItem('currentInvoice'));
+            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
             
-            if (status === 'partial') {
-                const amount = prompt('المبلغ المدفوع (درهم):');
-                paidAmount = parseFloat(amount) || 0;
-                if (isNaN(paidAmount) || paidAmount <= 0) {
-                    alert('❗ الرجاء إدخال مبلغ صحيح');
-                    return;
-                }
-            } else if (status === 'paid') {
-                paidAmount = currentInvoice.total;
+            if (!currentInvoice) {
+                alert('❗ يرجى البدء بإنشاء فاتورة أولاً');
+                window.location.href = 'index.html';
+                return;
             }
 
-            // تحديث بيانات الفاتورة
-            const updatedInvoice = {
-                ...currentInvoice,
-                status: status,
-                paidAmount: paidAmount,
-                paymentDate: new Date().toLocaleDateString('ar-EG')
-            };
+            // تعبئة البيانات
+            document.getElementById('invoiceId').textContent = currentInvoice.id;
+            document.getElementById('invoiceDate').textContent = currentInvoice.date;
+            document.getElementById('customerName').textContent = currentInvoice.customer.name;
+            document.getElementById('totalAmount').textContent = currentInvoice.total;
 
-            // تحديث localStorage
-            const updatedInvoices = allInvoices.map(inv => 
-                inv.id === currentInvoice.id ? updatedInvoice : inv
-            );
-            
-            localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-            localStorage.setItem('currentInvoice', JSON.stringify(updatedInvoice));
-            
-            window.location.href = 'history.html';
-        }
+            // عرض العناصر
+            const itemsList = document.getElementById('itemsList');
+            itemsList.innerHTML = currentInvoice.items.map(item => `
+                <div class="invoice-item">
+                    <span>${item.name}</span>
+                    <span>${item.quantity} × ${item.price} درهم</span>
+                    <span>${item.quantity * item.price} درهم</span>
+                </div>
+            `).join('');
+
+            // معالجة الدفع
+            window.handlePayment = (status) => {
+                let paidAmount = 0;
+                
+                if (status === 'partial') {
+                    const amount = prompt('المبلغ المدفوع (درهم):');
+                    paidAmount = parseFloat(amount) || 0;
+                    if (paidAmount <= 0 || isNaN(paidAmount)) {
+                        alert('❗ المبلغ غير صالح!');
+                        return;
+                    }
+                } else if (status === 'paid') {
+                    paidAmount = currentInvoice.total;
+                }
+
+                // تحديث الفاتورة
+                const updatedInvoice = {
+                    ...currentInvoice,
+                    status: status,
+                    paidAmount: paidAmount,
+                    paymentDate: new Date().toLocaleDateString('ar-EG')
+                };
+
+                // تحديث التخزين المحلي
+                const updatedInvoices = invoices.map(inv => 
+                    inv.id === currentInvoice.id ? updatedInvoice : inv
+                );
+                
+                localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+                localStorage.setItem('currentInvoice', JSON.stringify(updatedInvoice));
+                
+                window.location.href = 'history.html';
+            };
+        });
     </script>
 </body>
 </html>

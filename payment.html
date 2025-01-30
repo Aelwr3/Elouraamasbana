@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الدفع - مصبنة مشاء الله</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #002b4d, #004c6d);
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .payment-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #003954dd;
+            border: 2px solid #005f99;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        }
+
+        .payment-header {
+            text-align: center;
+            border-bottom: 2px solid #005f99;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payment-details {
+            margin: 20px 0;
+        }
+
+        .payment-status {
+            display: grid;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .status-btn {
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .paid { background: #00e676; color: #002b4d; }
+        .partial { background: #ffc107; color: #002b4d; }
+        .unpaid { background: #ff5252; color: white; }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #ff525255;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        .invoice-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #005f9955;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1>إتمام عملية الدفع</h1>
+            <p>رقم الفاتورة: <span id="invoiceId"></span></p>
+        </div>
+
+        <div class="payment-details">
+            <h3>الزبون: <span id="customerName"></span></h3>
+            <div id="paymentItems"></div>
+            <h2 class="total-amount">المجموع: <span id="totalAmount">0</span> درهم</h2>
+        </div>
+
+        <div class="payment-status">
+            <button class="status-btn paid" onclick="handlePayment('paid')">
+                ✅ دفع كامل
+            </button>
+            <button class="status-btn partial" onclick="handlePayment('partial')">
+                💰 دفع جزئي
+            </button>
+            <button class="status-btn unpaid" onclick="handlePayment('unpaid')">
+                ❌ لم يتم الدفع
+            </button>
+        </div>
+    </div>
+
+    <button class="back-btn" onclick="window.history.back()">← الرجوع</button>
+
+    <script>
+        // جلب بيانات الفاتورة من localStorage
+        const currentInvoice = JSON.parse(localStorage.getItem('currentInvoice')) || {};
+        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
+        // عرض بيانات الفاتورة
+        document.getElementById('invoiceId').textContent = currentInvoice.id;
+        document.getElementById('customerName').textContent = currentInvoice.customer?.name || 'عميل غير معروف';
+        document.getElementById('totalAmount').textContent = currentInvoice.total;
+
+        const itemsContainer = document.getElementById('paymentItems');
+        itemsContainer.innerHTML = currentInvoice.items?.map(item => `
+            <div class="invoice-item">
+                <span>${item.name}</span>
+                <span>${item.price} درهم</span>
+            </div>
+        `).join('') || '';
+
+        // معالجة حالة الدفع
+        function handlePayment(status) {
+            let paymentData = {
+                status: status,
+                paidAmount: 0,
+                paymentDate: new Date().toLocaleDateString('ar-EG')
+            };
+
+            switch(status) {
+                case 'paid':
+                    paymentData.paidAmount = currentInvoice.total;
+                    break;
+                case 'partial':
+                    const amount = prompt('المبلغ المدفوع (درهم):');
+                    paymentData.paidAmount = parseFloat(amount) || 0;
+                    break;
+            }
+
+            // تحديث الفاتورة
+            const updatedInvoice = {
+                ...currentInvoice,
+                ...paymentData
+            };
+
+            // تحديث localStorage
+            const updatedInvoices = invoices.map(inv => 
+                inv.id === currentInvoice.id ? updatedInvoice : inv
+            );
+            localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+            localStorage.setItem('currentInvoice', JSON.stringify(updatedInvoice));
+
+            // التوجيه لصفحة السجل
+            window.location.href = 'history.html';
+        }
+    </script>
+</body>
+</html>

@@ -6,42 +6,57 @@
     <title>سجل الفواتير - مصبنة مشاء الله</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #002b4d;
+            --secondary: #00e676;
+            --warning: #ff5252;
+            --bg-gradient: linear-gradient(135deg, #002b4d, #004c6d);
+        }
+
         body {
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #002b4d, #004c6d);
-            color: #ffffff;
+            background: var(--bg-gradient);
+            color: white;
             min-height: 100vh;
+            font-family: 'Amiri', serif;
         }
 
-        .container {
+        .history-container {
             max-width: 800px;
             margin: 0 auto;
         }
 
         .search-box {
-            background: #003954dd;
+            background: rgba(0, 57, 84, 0.9);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        input[type="text"] {
+        .search-input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #005f99;
+            border: 2px solid var(--secondary);
             border-radius: 8px;
-            background: #005f9933;
+            background: rgba(255,255,255,0.1);
             color: white;
             font-size: 16px;
         }
 
         .invoice-card {
-            background: #003954dd;
-            border: 2px solid #005f99;
+            background: rgba(0, 57, 84, 0.9);
+            border: 2px solid var(--secondary);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .invoice-card:hover {
+            transform: translateY(-3px);
         }
 
         .invoice-header {
@@ -57,35 +72,85 @@
             font-size: 14px;
         }
 
-        .paid { background: #00e67633; color: #00e676; }
-        .unpaid { background: #ff525233; color: #ff5252; }
-        .partial { background: #ffc10733; color: #ffc107; }
+        .paid { background: rgba(0, 230, 118, 0.2); color: var(--secondary); }
+        .unpaid { background: rgba(255, 82, 82, 0.2); color: var(--warning); }
+        .partial { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
 
-        .back-btn {
+        .controls {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: #ff525255;
-            padding: 12px 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
             border-radius: 30px;
-            cursor: pointer;
             border: none;
-            color: white;
+            cursor: pointer;
+            font-family: 'Amiri', serif;
+            transition: opacity 0.3s;
+        }
+
+        .control-btn:hover {
+            opacity: 0.9;
+        }
+
+        .invoice-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 15px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            color: var(--warning);
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- نافذة عرض الفاتورة -->
+    <div class="invoice-modal" id="invoiceModal">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div id="modalContent"></div>
+    </div>
+
+    <div class="history-container">
         <div class="search-box">
             <input type="text" 
-                   placeholder="ابحث برقم الفاتورة أو اسم الزبون..."
+                   class="search-input" 
+                   placeholder="🔍 ابحث برقم الفاتورة أو اسم الزبون..."
                    onkeyup="searchInvoices(this.value)">
         </div>
 
         <div id="invoicesList"></div>
     </div>
 
-    <button class="back-btn" onclick="window.location.href='index.html'">← الرئيسية</button>
+    <div class="controls">
+        <button class="control-btn" style="background: var(--secondary);" 
+                onclick="window.location.href='customer-selection.html'">
+            👥 إدارة الزبائن
+        </button>
+        <button class="control-btn" style="background: var(--warning);" 
+                onclick="window.location.href='index.html'">
+            🔒 إغلاق النظام
+        </button>
+    </div>
 
     <script>
         let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
@@ -93,24 +158,60 @@
         function renderInvoices(filteredInvoices = invoices) {
             const container = document.getElementById('invoicesList');
             container.innerHTML = filteredInvoices.map(invoice => `
-                <div class="invoice-card">
+                <div class="invoice-card" onclick="showInvoiceDetails('${invoice.id}')">
                     <div class="invoice-header">
                         <div>
-                            <h3>فاتورة #${invoice.id}</h3>
-                            <p>${invoice.customer?.name || 'عميل غير معروف'}</p>
+                            <h3 style="margin: 0; color: var(--secondary);">فاتورة #${invoice.id}</h3>
+                            <p style="margin: 5px 0;">الزبون: ${invoice.customer?.name || 'غير معروف'}</p>
                         </div>
                         <span class="status ${invoice.status}">
                             ${getStatusText(invoice.status)}
                             ${invoice.status === 'partial' ? `(${invoice.paidAmount} درهم)` : ''}
                         </span>
                     </div>
-                    <div>
+                    <div style="display: flex; justify-content: space-between;">
                         <p>التاريخ: ${invoice.paymentDate || invoice.date}</p>
                         <p>المجموع: ${invoice.total} درهم</p>
-                        ${invoice.status !== 'unpaid' ? `<p>المدفوع: ${invoice.paidAmount} درهم</p>` : ''}
                     </div>
                 </div>
             `).reverse().join('');
+        }
+
+        function showInvoiceDetails(invoiceId) {
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            const modal = document.getElementById('invoiceModal');
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <div style="text-align: center;">
+                    <h2 style="color: var(--secondary); margin: 0 0 20px 0;">فاتورة #${invoice.id}</h2>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <p>الزبون: <span style="color: var(--secondary);">${invoice.customer?.name}</span></p>
+                        <p>التاريخ: ${invoice.date}</p>
+                        <p>حالة الدفع: <span class="status ${invoice.status}">${getStatusText(invoice.status)}</span></p>
+                        ${invoice.status !== 'unpaid' ? `
+                        <p>المدفوع: ${invoice.paidAmount} درهم</p>
+                        <p>تاريخ الدفع: ${invoice.paymentDate}</p>` : ''}
+                    </div>
+                    
+                    <h3 style="margin: 20px 0 10px 0;">البنود</h3>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${invoice.items.map(item => `
+                            <div style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span>${item.name}</span>
+                                <span>${item.quantity} × ${item.price}</span>
+                                <span>${item.quantity * item.price} درهم</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="margin-top: 20px; font-size: 1.2em;">
+                        المجموع الكلي: <span style="color: var(--secondary);">${invoice.total} درهم</span>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
         }
 
         function searchInvoices(value) {
@@ -128,6 +229,10 @@
                 'unpaid': 'غير مدفوع',
                 'partial': 'مدفوع جزئيًا'
             }[status] || status;
+        }
+
+        function closeModal() {
+            document.getElementById('invoiceModal').style.display = 'none';
         }
 
         // التحميل الأولي
